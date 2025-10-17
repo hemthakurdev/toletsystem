@@ -1,7 +1,10 @@
 <template>
     <div class="min-h-screen bg-gray-50">
-        <!-- Header -->
-        <header class="bg-white shadow-sm">
+        <!-- Frontend Header for logged in users -->
+        <FrontendHeader v-if="$page.props.auth?.user" :current-path="$page.url" />
+        
+        <!-- Public Header for non-logged in users -->
+        <header v-else class="bg-white shadow-sm">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <div class="flex items-center">
@@ -240,6 +243,7 @@
 import { ref, onMounted } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import axios from 'axios'
+import FrontendHeader from '../../Components/FrontendHeader.vue'
 import LeadForm from '../../Components/LeadForm.vue'
 
 const page = usePage()

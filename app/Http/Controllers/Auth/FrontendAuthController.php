@@ -89,7 +89,7 @@ class FrontendAuthController extends Controller
     /**
      * Handle frontend user login.
      */
-    public function login(Request $request): JsonResponse
+    public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -108,15 +108,13 @@ class FrontendAuthController extends Controller
         $credentials = $request->only('email', 'password');
         $remember = $request->boolean('remember');
 
-        // Only allow frontend users to login
-        $user = User::where('email', $credentials['email'])
-                   ->where('user_type', 'frontend')
-                   ->first();
+        // Allow both frontend and organization users to login
+        $user = User::where('email', $credentials['email'])->first();
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid credentials or account type.',
+                'message' => 'Invalid credentials.',
             ], 401);
         }
 
@@ -126,12 +124,17 @@ class FrontendAuthController extends Controller
         // Update last login
         $user->updateLastLogin();
 
+        // Check if this is an Inertia request
+        if ($request->header('X-Inertia')) {
+            return redirect('/');
+        }
+
+        // Return JSON response for API calls
         return response()->json([
             'success' => true,
             'message' => 'Login successful!',
             'data' => [
                 'user' => $user,
-                'redirect' => '/user/dashboard',
             ],
         ]);
     }
@@ -139,12 +142,18 @@ class FrontendAuthController extends Controller
     /**
      * Handle frontend user logout.
      */
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        // Check if this is an Inertia request
+        if ($request->header('X-Inertia')) {
+            return redirect('/');
+        }
+
+        // Return JSON response for API calls
         return response()->json([
             'success' => true,
             'message' => 'Logged out successfully.',

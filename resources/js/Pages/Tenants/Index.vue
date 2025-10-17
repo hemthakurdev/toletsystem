@@ -1,38 +1,27 @@
 <template>
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <!-- Navigation -->
-        <nav class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <h1 class="text-2xl font-bold text-sky-800">SaleMitra</h1>
-                        </div>
-                        <div class="ml-10 flex items-baseline space-x-4">
-                            <a href="/dashboard" class="nav-link">Dashboard</a>
-                            <a href="/properties" class="nav-link">Properties</a>
-                            <a href="/tenants" class="nav-link active">Tenants</a>
-                            <a href="#" class="nav-link">Invoices</a>
-                            <a href="#" class="nav-link">Leads</a>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <button @click="showAddModal = true" class="btn-primary">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Add Tenant
-                        </button>
-                        <div class="relative">
-                            <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=John+Doe&color=7F9CF5&background=EBF4FF" alt="Profile" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        <Header current-path="/tenants">
+            <template #action-button>
+                <button @click="showAddModal = true" class="btn btn-primary hidden sm:flex">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add Tenant
+                </button>
+            </template>
+            <template #mobile-action-button>
+                <button @click="showAddModal = true" class="btn btn-primary w-full">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add Tenant
+                </button>
+            </template>
+        </Header>
 
         <!-- Main Content -->
-        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="container-mobile py-6">
             <!-- Page Header -->
             <div class="px-4 py-6 sm:px-0">
                 <div class="mb-6">
@@ -43,19 +32,19 @@
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                     <div class="stat-card">
-                        <div class="stat-number text-sky-800">{{ stats.total }}</div>
+                        <div class="stat-number text-sky-800">{{ props.stats.total }}</div>
                         <div class="stat-label">Total Tenants</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number text-green-600">{{ stats.active }}</div>
+                        <div class="stat-number text-green-600">{{ props.stats.active }}</div>
                         <div class="stat-label">Active Leases</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number text-yellow-600">{{ stats.expiring }}</div>
+                        <div class="stat-number text-yellow-600">{{ props.stats.expiring }}</div>
                         <div class="stat-label">Expiring Soon</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number text-red-600">{{ stats.overdue }}</div>
+                        <div class="stat-number text-red-600">{{ props.stats.overdue }}</div>
                         <div class="stat-label">Overdue Payments</div>
                     </div>
                 </div>
@@ -101,8 +90,8 @@
                         </div>
                     </div>
                     <div class="mt-4 flex justify-between">
-                        <button @click="applyFilters" class="btn-primary">Apply Filters</button>
-                        <button @click="clearFilters" class="btn-secondary">Clear Filters</button>
+                        <button @click="applyFilters" class="btn btn-primary">Apply Filters</button>
+                        <button @click="clearFilters" class="btn btn-secondary">Clear Filters</button>
                     </div>
                 </div>
 
@@ -121,7 +110,7 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="tenant in tenants" :key="tenant.id" class="hover:bg-gray-50">
+                                <tr v-for="tenant in props.tenants" :key="tenant.id" class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
@@ -182,7 +171,7 @@
                         <h3 class="mt-2 text-sm font-medium text-gray-900">No tenants</h3>
                         <p class="mt-1 text-sm text-gray-500">Get started by adding a new tenant.</p>
                         <div class="mt-6">
-                            <button @click="showAddModal = true" class="btn-primary">
+                            <button @click="showAddModal = true" class="btn btn-primary">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
@@ -207,7 +196,7 @@
                         </button>
                     </div>
                     
-                    <TenantForm @saved="onTenantSaved" @cancelled="showAddModal = false" :properties="properties" />
+                    <TenantForm @saved="onTenantSaved" @cancelled="showAddModal = false" :properties="props.properties" />
                 </div>
             </div>
         </div>
@@ -216,19 +205,31 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import Header from '../../Components/Header.vue'
 import TenantForm from './TenantForm.vue'
 
-const tenants = ref([])
-const properties = ref([])
+const props = defineProps({
+    tenants: {
+        type: Array,
+        default: () => []
+    },
+    properties: {
+        type: Array,
+        default: () => []
+    },
+    stats: {
+        type: Object,
+        default: () => ({
+            total: 0,
+            active: 0,
+            expiring: 0,
+            overdue: 0
+        })
+    }
+})
+
 const loading = ref(false)
 const showAddModal = ref(false)
-
-const stats = ref({
-    total: 0,
-    active: 0,
-    expiring: 0,
-    overdue: 0
-})
 
 const filters = ref({
     search: '',
@@ -279,45 +280,12 @@ const getDaysUntilExpiry = (endDate) => {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }
 
-const loadTenants = async () => {
-    loading.value = true
-    try {
-        const response = await fetch('http://127.0.0.1:8000/api/v1/org/tenants?' + new URLSearchParams(filters.value))
-        const data = await response.json()
-        if (data.success) {
-            tenants.value = data.data.data
-            calculateStats()
-        }
-    } catch (error) {
-        console.error('Error loading tenants:', error)
-    } finally {
-        loading.value = false
-    }
-}
-
-const loadProperties = async () => {
-    try {
-        const response = await fetch('http://127.0.0.1:8000/api/v1/org/properties')
-        const data = await response.json()
-        if (data.success) {
-            properties.value = data.data.data
-        }
-    } catch (error) {
-        console.error('Error loading properties:', error)
-    }
-}
-
-const calculateStats = () => {
-    stats.value = {
-        total: tenants.value.length,
-        active: tenants.value.filter(t => t.status === 'active').length,
-        expiring: tenants.value.filter(t => isLeaseExpiring(t.lease_end_date)).length,
-        overdue: 0 // This would be calculated from payment data
-    }
-}
+// Data is now provided via props from the backend controller
 
 const applyFilters = () => {
-    loadTenants()
+    // Filters will be handled by the backend controller
+    // For now, we'll just reload the page to apply filters
+    window.location.reload()
 }
 
 const clearFilters = () => {
@@ -365,11 +333,9 @@ const deleteTenant = async (tenant) => {
 
 const onTenantSaved = () => {
     showAddModal.value = false
-    loadTenants()
+    // Reload the page to show the new tenant
+    window.location.reload()
 }
 
-onMounted(() => {
-    loadTenants()
-    loadProperties()
-})
+// Data is now provided via props from the backend controller
 </script>

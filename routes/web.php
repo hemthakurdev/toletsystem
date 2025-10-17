@@ -19,41 +19,65 @@ Route::get('/api-test', function () {
     return response()->json(['message' => 'Laravel is working!', 'timestamp' => now()]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->name('dashboard');
+Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('dashboard');
 
-Route::get('/properties', function () {
-    return Inertia::render('Properties/Index');
-})->name('properties.index');
+Route::get('/properties', [App\Http\Controllers\PropertiesController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('properties.index');
 
-Route::get('/properties/create', function () {
-    return Inertia::render('Properties/Create');
-})->middleware(['auth'])->name('properties.create');
+Route::get('/properties/create', [App\Http\Controllers\PropertiesController::class, 'create'])
+    ->middleware(['auth'])
+    ->name('properties.create');
 
-Route::get('/properties/{property}', function ($id) {
-    return Inertia::render('Properties/Show', ['id' => $id]);
-})->middleware(['auth'])->name('properties.show');
+Route::post('/properties', [App\Http\Controllers\PropertiesController::class, 'store'])
+    ->middleware(['auth'])
+    ->name('properties.store');
 
-Route::get('/properties/{property}/edit', function ($id) {
-    return Inertia::render('Properties/Edit', ['id' => $id]);
-})->middleware(['auth'])->name('properties.edit');
+Route::get('/properties/{property}', [App\Http\Controllers\PropertiesController::class, 'show'])
+    ->middleware(['auth'])
+    ->name('properties.show');
 
-Route::get('/tenants', function () {
-    return Inertia::render('Tenants/Index');
-})->name('tenants.index');
+Route::get('/properties/{property}/edit', [App\Http\Controllers\PropertiesController::class, 'edit'])
+    ->middleware(['auth'])
+    ->name('properties.edit');
 
-Route::get('/tenants/create', function () {
-    return Inertia::render('Tenants/Create');
-})->middleware(['auth'])->name('tenants.create');
+Route::put('/properties/{property}', [App\Http\Controllers\PropertiesController::class, 'update'])
+    ->middleware(['auth'])
+    ->name('properties.update');
 
-Route::get('/tenants/{tenant}', function ($id) {
-    return Inertia::render('Tenants/Show', ['id' => $id]);
-})->middleware(['auth'])->name('tenants.show');
+Route::delete('/properties/{property}', [App\Http\Controllers\PropertiesController::class, 'destroy'])
+    ->middleware(['auth'])
+    ->name('properties.destroy');
 
-Route::get('/tenants/{tenant}/edit', function ($id) {
-    return Inertia::render('Tenants/Edit', ['id' => $id]);
-})->middleware(['auth'])->name('tenants.edit');
+Route::get('/tenants', [App\Http\Controllers\TenantsController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('tenants.index');
+
+Route::get('/tenants/create', [App\Http\Controllers\TenantsController::class, 'create'])
+    ->middleware(['auth'])
+    ->name('tenants.create');
+
+Route::get('/tenants/{tenant}', [App\Http\Controllers\TenantsController::class, 'show'])
+    ->middleware(['auth'])
+    ->name('tenants.show');
+
+Route::get('/tenants/{tenant}/edit', [App\Http\Controllers\TenantsController::class, 'edit'])
+    ->middleware(['auth'])
+    ->name('tenants.edit');
+
+Route::post('/tenants', [App\Http\Controllers\TenantsController::class, 'store'])
+    ->middleware(['auth'])
+    ->name('tenants.store');
+
+Route::put('/tenants/{tenant}', [App\Http\Controllers\TenantsController::class, 'update'])
+    ->middleware(['auth'])
+    ->name('tenants.update');
+
+Route::delete('/tenants/{tenant}', [App\Http\Controllers\TenantsController::class, 'destroy'])
+    ->middleware(['auth'])
+    ->name('tenants.destroy');
 
 Route::get('/tenants/{tenant}/payments', function ($id) {
     return Inertia::render('Tenants/Payments', ['id' => $id]);

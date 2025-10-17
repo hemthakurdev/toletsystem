@@ -71,16 +71,16 @@
 
         <!-- Form Actions -->
         <div class="flex justify-between">
-            <button type="button" @click="previewInvoices" :disabled="loading" class="btn-secondary">
+            <button type="button" @click="previewInvoices" :disabled="loading" class="btn btn-secondary">
                 <span v-if="loading">Loading...</span>
                 <span v-else>Preview</span>
             </button>
             
             <div class="flex space-x-4">
-                <button type="button" @click="$emit('cancelled')" class="btn-secondary">
+                <button type="button" @click="$emit('cancelled')" class="btn btn-secondary">
                     Cancel
                 </button>
-                <button type="submit" :disabled="loading || previewData.length === 0" class="btn-primary">
+                <button type="submit" :disabled="loading || previewData.length === 0" class="btn btn-primary">
                     <span v-if="loading">Generating...</span>
                     <span v-else>Generate Invoices</span>
                 </button>

@@ -1,7 +1,10 @@
 <template>
     <div class="min-h-screen bg-gray-50">
-        <!-- Header -->
-        <header class="bg-white shadow-sm">
+        <!-- Frontend Header for logged in users -->
+        <FrontendHeader v-if="$page.props.auth?.user" :current-path="$page.url" />
+        
+        <!-- Public Header for non-logged in users -->
+        <header v-else class="bg-white shadow-sm">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <div class="flex items-center">
@@ -16,7 +19,7 @@
                     <div class="flex items-center space-x-4">
                         <a href="/user/login" class="text-gray-600 hover:text-gray-900">Login</a>
                         <div class="relative group">
-                            <a href="/user/register" class="btn-primary">Sign Up</a>
+                            <a href="/user/register" class="btn btn-primary">Sign Up</a>
                             <!-- Dropdown Menu -->
                             <div class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                                 <div class="p-4">
@@ -120,7 +123,7 @@
                                 </select>
                             </div>
                         </div>
-                        <button @click="searchProperties" class="mt-4 btn-primary">
+                        <button @click="searchProperties" class="btn btn-primary mt-4">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
@@ -191,7 +194,7 @@
                                 <span>{{ property.bathrooms }} Baths</span>
                                 <span>{{ property.area }} sq ft</span>
                             </div>
-                            <button @click="viewProperty(property)" class="mt-4 btn-primary">
+                            <button @click="viewProperty(property)" class="btn btn-primary mt-4">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -299,6 +302,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { usePage } from '@inertiajs/vue3'
+import FrontendHeader from '../../Components/FrontendHeader.vue'
+
+const page = usePage()
 
 const featuredProperties = ref([])
 const recentProperties = ref([])

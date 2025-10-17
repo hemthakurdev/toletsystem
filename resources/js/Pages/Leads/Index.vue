@@ -1,32 +1,11 @@
 <template>
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <!-- Navigation -->
-        <nav class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <h1 class="text-2xl font-bold text-sky-800">SaleMitra</h1>
-                        </div>
-                        <div class="ml-10 flex items-baseline space-x-4">
-                            <a href="/dashboard" class="nav-link">Dashboard</a>
-                            <a href="/properties" class="nav-link">Properties</a>
-                            <a href="/tenants" class="nav-link">Tenants</a>
-                            <a href="/invoices" class="nav-link">Invoices</a>
-                            <a href="/leads" class="nav-link active">Leads</a>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="relative">
-                            <img class="h-8 w-8 rounded-full" :src="$page.props.auth.user?.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent($page.props.auth.user?.name || 'User') + '&color=7F9CF5&background=EBF4FF'" alt="Profile" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        <Header current-path="/leads">
+        </Header>
 
         <!-- Main Content -->
-        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="container-mobile py-6">
             <!-- Page Header -->
             <div class="px-4 py-6 sm:px-0">
                 <div class="flex justify-between items-center mb-6">
@@ -35,7 +14,7 @@
                         <p class="text-gray-600 mt-1">Manage inquiries from potential tenants</p>
                     </div>
                     <div class="flex space-x-3">
-                        <button @click="refreshData" class="btn-secondary">
+                        <button @click="refreshData" class="btn btn-secondary">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                             </svg>
@@ -189,14 +168,14 @@
                                 <button 
                                     @click="loadLeads(pagination.current_page - 1)"
                                     :disabled="pagination.current_page <= 1"
-                                    class="btn-secondary"
+                                    class="btn btn-secondary"
                                 >
                                     Previous
                                 </button>
                                 <button 
                                     @click="loadLeads(pagination.current_page + 1)"
                                     :disabled="pagination.current_page >= pagination.last_page"
-                                    class="btn-secondary"
+                                    class="btn btn-secondary"
                                 >
                                     Next
                                 </button>
@@ -220,6 +199,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import Header from '../../Components/Header.vue'
 import axios from 'axios'
 import LeadDetailModal from './LeadDetailModal.vue'
 

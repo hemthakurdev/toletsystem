@@ -1,70 +1,7 @@
 <template>
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <!-- Navigation -->
-        <nav class="glass sticky top-0 z-50 backdrop-blur-md">
-            <div class="container-mobile">
-                <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <h1 class="text-2xl font-bold bg-gradient-to-r from-sky-800 to-sky-900 bg-clip-text text-transparent">
-                                SaleMitra
-                            </h1>
-                        </div>
-                        <div class="hidden lg:ml-10 lg:flex lg:items-baseline lg:space-x-4">
-                            <a href="/user/dashboard" class="nav-link active">Dashboard</a>
-                            <a href="/marketplace" class="nav-link">Browse Properties</a>
-                            <a href="/user/favorites" class="nav-link">Favorites</a>
-                            <a href="/user/profile" class="nav-link">Profile</a>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <!-- Notifications -->
-                        <div class="relative">
-                            <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100">
-                                <span class="sr-only">View notifications</span>
-                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828z" />
-                                </svg>
-                            </button>
-                        </div>
-                        <!-- User Profile -->
-                        <div class="flex items-center space-x-3">
-                            <div class="hidden sm:block text-sm">
-                                <p class="text-gray-700 font-medium">{{ $page.props.auth?.user?.name || 'User' }}</p>
-                                <p class="text-gray-500 text-xs">Frontend User</p>
-                            </div>
-                            <ImagePlaceholder 
-                                :src="$page.props.auth?.user?.avatar_url"
-                                :alt="($page.props.auth?.user?.name || 'User') + ' Profile'"
-                                size="sm"
-                                shape="circle"
-                                :placeholder-text="($page.props.auth?.user?.name || 'User').charAt(0)"
-                                className="border-2 border-white shadow-soft"
-                            />
-                            <button @click="logout" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">Logout</button>
-                        </div>
-                        <!-- Mobile Menu Button -->
-                        <button 
-                            @click="toggleMobileMenu"
-                            class="lg:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors"
-                        >
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <!-- Mobile Menu -->
-                <div v-if="showMobileMenu" class="lg:hidden py-4 border-t border-gray-200">
-                    <div class="flex flex-col space-y-2">
-                        <a href="/user/dashboard" class="nav-link active">Dashboard</a>
-                        <a href="/marketplace" class="nav-link">Browse Properties</a>
-                        <a href="/user/favorites" class="nav-link">Favorites</a>
-                        <a href="/user/profile" class="nav-link">Profile</a>
-                    </div>
-                </div>
-            </div>
-        </nav>
+        <!-- Frontend Header -->
+        <FrontendHeader :current-path="$page.url" />
 
         <!-- Main Content -->
         <div class="container-mobile py-6">
@@ -140,7 +77,7 @@
                             </div>
                         </div>
                         <p class="text-gray-600 mb-4">Discover thousands of properties available for rent, sale, or PG accommodation.</p>
-                        <a href="/marketplace" class="btn-primary">
+                        <a href="/marketplace" class="btn btn-primary">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
@@ -200,7 +137,7 @@
                             <h3 class="mt-2 text-sm font-medium text-gray-900">No favorites yet</h3>
                             <p class="mt-1 text-sm text-gray-500">Start browsing properties to add them to your favorites.</p>
                             <div class="mt-6">
-                                <a href="/marketplace" class="btn-primary">Browse Properties</a>
+                                <a href="/marketplace" class="btn btn-primary">Browse Properties</a>
                             </div>
                         </div>
                         <div v-else class="space-y-4">
@@ -244,7 +181,7 @@
                             <h3 class="mt-2 text-sm font-medium text-gray-900">No inquiries yet</h3>
                             <p class="mt-1 text-sm text-gray-500">Contact property owners to start your inquiries.</p>
                             <div class="mt-6">
-                                <a href="/marketplace" class="btn-primary">Browse Properties</a>
+                                <a href="/marketplace" class="btn btn-primary">Browse Properties</a>
                             </div>
                         </div>
                         <div v-else class="space-y-4">
@@ -273,12 +210,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
+import FrontendHeader from '../../Components/FrontendHeader.vue'
 import ImagePlaceholder from '../../Components/ImagePlaceholder.vue'
 import ModernCard from '../../Components/ModernCard.vue'
 import axios from 'axios'
 
 const loading = ref(true)
-const showMobileMenu = ref(false)
 const stats = ref({
     favorites: 0,
     inquiries: 0,
@@ -287,20 +224,6 @@ const stats = ref({
 })
 const recentFavorites = ref([])
 const recentInquiries = ref([])
-
-const toggleMobileMenu = () => {
-    showMobileMenu.value = !showMobileMenu.value
-}
-
-const logout = async () => {
-    try {
-        await axios.post('/user/logout')
-        router.visit('/')
-    } catch (error) {
-        console.error('Logout error:', error)
-        router.visit('/')
-    }
-}
 
 const formatPrice = (price) => {
     if (!price) return '0'

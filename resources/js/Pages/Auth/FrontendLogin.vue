@@ -141,7 +141,7 @@
                             <button
                                 type="submit"
                                 :disabled="loading"
-                                class="btn-primary w-full"
+                                class="btn btn-primary w-full"
                             >
                                 <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -184,32 +184,30 @@ const form = reactive({
     remember: false,
 })
 
-const login = async () => {
+const login = () => {
     loading.value = true
     successMessage.value = ''
     errorMessage.value = ''
     errors.value = {}
     
-    try {
-        const response = await axios.post('/user/login', form)
-        
-        if (response.data.success) {
-            successMessage.value = response.data.message
-            // Redirect to user dashboard
+    router.post('/user/login', form, {
+        onSuccess: () => {
+            successMessage.value = 'Login successful!'
+            // Redirect to frontend home page
             setTimeout(() => {
-                router.visit('/user/dashboard')
+                router.visit('/')
             }, 1000)
-        } else {
-            errorMessage.value = response.data.message || 'Login failed'
+        },
+        onError: (errors) => {
+            if (errors.message) {
+                errorMessage.value = errors.message
+            } else {
+                errors.value = errors
+            }
+        },
+        onFinish: () => {
+            loading.value = false
         }
-    } catch (error) {
-        if (error.response?.status === 422) {
-            errors.value = error.response.data.errors
-        } else {
-            errorMessage.value = error.response?.data?.message || 'Login failed. Please check your credentials.'
-        }
-    } finally {
-        loading.value = false
-    }
+    })
 }
 </script>

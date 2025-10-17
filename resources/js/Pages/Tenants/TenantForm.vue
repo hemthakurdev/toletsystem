@@ -151,10 +151,10 @@
 
         <!-- Form Actions -->
         <div class="flex justify-end space-x-4">
-            <button type="button" @click="$emit('cancelled')" class="btn-secondary">
+            <button type="button" @click="$emit('cancelled')" class="btn btn-secondary">
                 Cancel
             </button>
-            <button type="submit" :disabled="loading" class="btn-primary">
+            <button type="submit" :disabled="loading" class="btn btn-primary">
                 <span v-if="loading">Saving...</span>
                 <span v-else>Save Tenant</span>
             </button>
@@ -196,11 +196,12 @@ const saveTenant = async () => {
     loading.value = true
     
     try {
-        const response = await fetch('/api/v1/tenants', {
+        const response = await fetch('/tenants', {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
             },
             body: JSON.stringify(form.value)
         })

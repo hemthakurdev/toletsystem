@@ -1,44 +1,43 @@
 <template>
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <!-- Navigation -->
-        <nav class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <h1 class="text-2xl font-bold text-sky-800">SaleMitra</h1>
-                        </div>
-                        <div class="ml-10 flex items-baseline space-x-4">
-                            <a href="/dashboard" class="nav-link">Dashboard</a>
-                            <a href="/properties" class="nav-link">Properties</a>
-                            <a href="/tenants" class="nav-link">Tenants</a>
-                            <a href="/invoices" class="nav-link active">Invoices</a>
-                            <a href="#" class="nav-link">Leads</a>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <button @click="showAddModal = true" class="btn-primary">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Create Invoice
-                        </button>
-                        <button @click="showBulkModal = true" class="btn-secondary">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Bulk Generate
-                        </button>
-                        <div class="relative">
-                            <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=John+Doe&color=7F9CF5&background=EBF4FF" alt="Profile" />
-                        </div>
-                    </div>
+        <Header current-path="/invoices">
+            <template #action-button>
+                <div class="flex space-x-2">
+                    <button @click="showAddModal = true" class="btn btn-primary hidden sm:flex">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Create Invoice
+                    </button>
+                    <button @click="showBulkModal = true" class="btn btn-secondary hidden sm:flex">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Bulk Generate
+                    </button>
                 </div>
-            </div>
-        </nav>
+            </template>
+            <template #mobile-action-button>
+                <div class="space-y-2">
+                    <button @click="showAddModal = true" class="btn btn-primary w-full">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Create Invoice
+                    </button>
+                    <button @click="showBulkModal = true" class="btn btn-secondary w-full">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Bulk Generate
+                    </button>
+                </div>
+            </template>
+        </Header>
 
         <!-- Main Content -->
-        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="container-mobile py-6">
             <!-- Page Header -->
             <div class="px-4 py-6 sm:px-0">
                 <div class="mb-6">
@@ -133,8 +132,8 @@
                         </div>
                     </div>
                     <div class="mt-4 flex justify-between">
-                        <button @click="applyFilters" class="btn-primary">Apply Filters</button>
-                        <button @click="clearFilters" class="btn-secondary">Clear Filters</button>
+                        <button @click="applyFilters" class="btn btn-primary">Apply Filters</button>
+                        <button @click="clearFilters" class="btn btn-secondary">Clear Filters</button>
                     </div>
                 </div>
 
@@ -216,7 +215,7 @@
                         <h3 class="mt-2 text-sm font-medium text-gray-900">No invoices</h3>
                         <p class="mt-1 text-sm text-gray-500">Get started by creating a new invoice.</p>
                         <div class="mt-6">
-                            <button @click="showAddModal = true" class="btn-primary">
+                            <button @click="showAddModal = true" class="btn btn-primary">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
@@ -278,6 +277,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import Header from '../../Components/Header.vue'
 import InvoiceForm from './InvoiceForm.vue'
 import BulkInvoiceForm from './BulkInvoiceForm.vue'
 import PaymentModal from '../../Components/PaymentModal.vue'

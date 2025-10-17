@@ -1,7 +1,10 @@
 <template>
     <div class="min-h-screen bg-gray-50">
-        <!-- Header -->
-        <header class="bg-white shadow-sm">
+        <!-- Frontend Header for logged in users -->
+        <FrontendHeader v-if="$page.props.auth?.user" :current-path="$page.url" />
+        
+        <!-- Public Header for non-logged in users -->
+        <header v-else class="bg-white shadow-sm">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <div class="flex items-center">
@@ -15,7 +18,7 @@
                     </div>
                     <div class="flex items-center space-x-4">
                         <a href="/login" class="text-gray-600 hover:text-gray-900">Login</a>
-                        <a href="/register" class="btn-primary">Sign Up</a>
+                        <a href="/register" class="btn btn-primary">Sign Up</a>
                     </div>
                 </div>
             </div>
@@ -54,13 +57,13 @@
                     </div>
                 </div>
                 <div class="mt-4 flex flex-col sm:flex-row gap-3 items-start">
-                    <button @click="applyFilters" class="btn-primary">
+                    <button @click="applyFilters" class="btn btn-primary">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                         Search Properties
                     </button>
-                    <button @click="showAdvancedFilters = !showAdvancedFilters" class="btn-secondary">
+                    <button @click="showAdvancedFilters = !showAdvancedFilters" class="btn btn-secondary">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
                         </svg>
@@ -180,10 +183,10 @@
                             <span>{{ property.area }} sq ft</span>
                         </div>
                         <div class="mt-4 flex space-x-2">
-                            <button @click="viewProperty(property)" class="flex-1 bg-sky-800 text-white py-2 rounded-lg hover:bg-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-800">
+                            <button @click="viewProperty(property)" class="btn btn-primary flex-1">
                                 View Details
                             </button>
-                            <button @click="contactOwner(property)" class="flex-1 bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                            <button @click="contactOwner(property)" class="btn btn-secondary flex-1">
                                 Contact
                             </button>
                         </div>
@@ -223,10 +226,10 @@
                                     <span>{{ property.transaction_type }}</span>
                                 </div>
                                 <div class="flex space-x-2">
-                                    <button @click="viewProperty(property)" class="bg-sky-800 text-white px-4 py-2 rounded-lg hover:bg-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-800">
+                                    <button @click="viewProperty(property)" class="btn btn-primary">
                                         View Details
                                     </button>
-                                    <button @click="contactOwner(property)" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                    <button @click="contactOwner(property)" class="btn btn-secondary">
                                         Contact
                                     </button>
                                 </div>
@@ -251,6 +254,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import FrontendHeader from '../../Components/FrontendHeader.vue'
 
 const properties = ref([])
 const cities = ref([])

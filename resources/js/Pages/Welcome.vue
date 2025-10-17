@@ -14,7 +14,7 @@
                         <div class="hidden sm:flex items-center space-x-4">
                             <a href="/user/login" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">Login</a>
                             <div class="relative group">
-                                <a href="/user/register" class="btn-primary">Get Started</a>
+                                <a href="/user/register" class="btn btn-primary">Get Started</a>
                                 <!-- Dropdown Menu -->
                                 <div class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                                 <div class="p-4">
@@ -101,35 +101,67 @@
         </nav>
 
         <!-- Hero Section -->
-        <div class="container-mobile py-12 sm:py-20">
-            <div class="text-center fade-in">
-                <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+        <div class="container-mobile py-12 sm:py-20 relative">
+            <!-- Floating Elements -->
+            <div class="absolute top-20 left-10 w-20 h-20 bg-sky-200/30 rounded-full blur-xl animate-float"></div>
+            <div class="absolute top-40 right-20 w-32 h-32 bg-indigo-200/30 rounded-full blur-xl animate-float" style="animation-delay: 2s;"></div>
+            <div class="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-200/30 rounded-full blur-xl animate-float" style="animation-delay: 4s;"></div>
+            
+            <div class="text-center fade-in-scale relative z-10">
+                <div class="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-white/20 shadow-lg mb-8">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse mr-2"></span>
+                    <span class="text-sm font-medium text-gray-700">Trusted by 10,000+ property owners</span>
+                </div>
+                
+                <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
                     Complete Property Management
-                    <span class="bg-gradient-to-r from-sky-800 to-sky-900 bg-clip-text text-transparent">Made Simple</span>
+                    <span class="bg-gradient-to-r from-sky-600 via-sky-700 to-sky-800 bg-clip-text text-transparent animate-gradient-shift">Made Simple</span>
                 </h1>
-                <p class="text-lg sm:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+                <p class="text-xl sm:text-2xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
                     Manage your rental properties, tenants, and finances all in one place. 
                     Plus, list your properties on our marketplace to reach more tenants.
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <a href="/user/register" class="btn-primary shadow-glow">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                    <a href="/user/register" class="btn btn-primary shadow-glow-hover group">
+                        <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                         Find Properties
                     </a>
-                    <a href="/register" class="btn-secondary">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="/register" class="btn btn-secondary group">
+                        <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
                         List Properties
                     </a>
-                    <a href="#features" class="btn-secondary">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="#features" class="btn btn-ghost group">
+                        <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         Learn More
                     </a>
+                </div>
+                
+                <!-- Trust Indicators -->
+                <div class="mt-12 flex flex-wrap justify-center items-center gap-8 opacity-60">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-gray-600">SSL Secured</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-gray-600">24/7 Support</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-gray-600">Mobile Ready</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -148,101 +180,165 @@
 
                 <div class="grid-responsive">
                     <!-- Feature 1 -->
-                    <div class="card text-center">
-                        <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-6 h-6 text-sky-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="card-premium text-center group cursor-pointer">
+                        <div class="icon-container icon-sky mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Property Management</h3>
-                        <p class="text-gray-600">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Property Management</h3>
+                        <p class="text-gray-600 leading-relaxed">
                             Add, edit, and manage all your properties with detailed information and photos.
                         </p>
+                        <div class="mt-4 text-sm text-sky-600 font-medium">
+                            Learn more →
+                        </div>
                     </div>
 
                     <!-- Feature 2 -->
-                    <div class="card text-center">
-                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="card-success text-center group cursor-pointer">
+                        <div class="icon-container icon-emerald mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Tenant Management</h3>
-                        <p class="text-gray-600">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Tenant Management</h3>
+                        <p class="text-gray-600 leading-relaxed">
                             Keep track of tenant information, lease agreements, and rent collection.
                         </p>
+                        <div class="mt-4 text-sm text-emerald-600 font-medium">
+                            Learn more →
+                        </div>
                     </div>
 
                     <!-- Feature 3 -->
-                    <div class="card text-center">
-                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="card text-center group cursor-pointer">
+                        <div class="icon-container icon-amber mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Financial Tracking</h3>
-                        <p class="text-gray-600">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Financial Tracking</h3>
+                        <p class="text-gray-600 leading-relaxed">
                             Generate invoices, track payments, and manage expenses with detailed reports.
                         </p>
+                        <div class="mt-4 text-sm text-amber-600 font-medium">
+                            Learn more →
+                        </div>
                     </div>
 
                     <!-- Feature 4 -->
-                    <div class="card text-center">
-                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="card text-center group cursor-pointer">
+                        <div class="icon-container bg-purple-100/80 text-purple-600 border border-purple-200/50 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Property Marketplace</h3>
-                        <p class="text-gray-600">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Property Marketplace</h3>
+                        <p class="text-gray-600 leading-relaxed">
                             List your properties on our marketplace to reach more potential tenants.
                         </p>
+                        <div class="mt-4 text-sm text-purple-600 font-medium">
+                            Learn more →
+                        </div>
                     </div>
 
                     <!-- Feature 5 -->
-                    <div class="card text-center">
-                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="card text-center group cursor-pointer">
+                        <div class="icon-container icon-red mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Analytics & Reports</h3>
-                        <p class="text-gray-600">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Analytics & Reports</h3>
+                        <p class="text-gray-600 leading-relaxed">
                             Get insights into your property performance with detailed analytics.
                         </p>
+                        <div class="mt-4 text-sm text-red-600 font-medium">
+                            Learn more →
+                        </div>
                     </div>
 
                     <!-- Feature 6 -->
-                    <div class="card text-center">
-                        <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="card text-center group cursor-pointer">
+                        <div class="icon-container bg-indigo-100/80 text-indigo-600 border border-indigo-200/50 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Mobile Ready</h3>
-                        <p class="text-gray-600">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Mobile Ready</h3>
+                        <p class="text-gray-600 leading-relaxed">
                             Access your property management dashboard from anywhere with our mobile-friendly interface.
                         </p>
+                        <div class="mt-4 text-sm text-indigo-600 font-medium">
+                            Learn more →
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- CTA Section -->
-        <div class="bg-sky-800 py-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-3xl font-bold text-white mb-4">
-                    Ready to Simplify Your Property Management?
+        <div class="relative bg-gradient-to-br from-sky-800 via-sky-900 to-indigo-900 py-20 overflow-hidden">
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-sky-600/20 to-transparent"></div>
+            
+            <!-- Floating Elements -->
+            <div class="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-float"></div>
+            <div class="absolute bottom-10 right-10 w-40 h-40 bg-indigo-400/20 rounded-full blur-2xl animate-float" style="animation-delay: 3s;"></div>
+            
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse mr-2"></span>
+                    <span class="text-sm font-medium text-white/90">Join 10,000+ property owners</span>
+                </div>
+                
+                <h2 class="text-4xl sm:text-5xl font-bold text-white mb-6 leading-tight">
+                    Ready to Simplify Your
+                    <span class="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Property Management?</span>
                 </h2>
-                <p class="text-xl text-sky-100 mb-8">
-                    Join thousands of property owners who trust SaleMitra to manage their rentals.
+                <p class="text-xl text-sky-100 mb-10 max-w-3xl mx-auto leading-relaxed">
+                    Join thousands of property owners who trust SaleMitra to manage their rentals. 
+                    Start your free trial today and experience the difference.
                 </p>
-                <a href="/register" class="bg-white text-sky-800 hover:bg-gray-100 font-medium py-4 px-8 rounded-lg text-lg transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center justify-center mx-auto w-fit">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                    Start Your Free Trial
-                </a>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="/register" class="bg-white text-sky-800 hover:bg-gray-50 font-semibold py-4 px-8 rounded-xl text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl flex items-center justify-center group transform hover:-translate-y-1">
+                        <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Start Your Free Trial
+                    </a>
+                    <a href="#features" class="bg-white/10 text-white hover:bg-white/20 font-semibold py-4 px-8 rounded-xl text-lg transition-all duration-300 backdrop-blur-sm border border-white/20 flex items-center justify-center group">
+                        <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Watch Demo
+                    </a>
+                </div>
+                
+                <!-- Trust Badges -->
+                <div class="mt-12 flex flex-wrap justify-center items-center gap-8 opacity-80">
+                    <div class="flex items-center space-x-2 text-white/80">
+                        <svg class="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm font-medium">No Credit Card Required</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-white/80">
+                        <svg class="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm font-medium">14-Day Free Trial</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-white/80">
+                        <svg class="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm font-medium">Cancel Anytime</span>
+                    </div>
+                </div>
             </div>
         </div>
 

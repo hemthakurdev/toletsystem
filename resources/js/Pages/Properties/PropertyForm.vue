@@ -183,6 +183,16 @@
                     </select>
                 </div>
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Availability Status *</label>
+                    <select v-model="form.availability_status" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-sky-800 focus:border-sky-500">
+                        <option value="">Select Availability</option>
+                        <option value="vacant">Vacant</option>
+                        <option value="occupied">Occupied</option>
+                        <option value="maintenance">Under Maintenance</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Floor</label>
                     <input
                         v-model="form.floor"
@@ -255,10 +265,10 @@
 
         <!-- Form Actions -->
         <div class="flex justify-end space-x-4">
-            <button type="button" @click="$emit('cancelled')" class="btn-secondary">
+            <button type="button" @click="$emit('cancelled')" class="btn btn-secondary">
                 Cancel
             </button>
-            <button type="submit" :disabled="loading" class="btn-primary">
+            <button type="submit" :disabled="loading" class="btn btn-primary">
                 <span v-if="loading">Saving...</span>
                 <span v-else>Save Property</span>
             </button>
@@ -303,6 +313,7 @@ const form = ref({
     bathrooms: '',
     area_sqft: '',
     furnished_status: '',
+    availability_status: '',
     floor: '',
     total_floors: '',
     amenities: []
@@ -312,11 +323,12 @@ const saveProperty = async () => {
     loading.value = true
     
     try {
-        const response = await fetch('/api/v1/properties', {
+        const response = await fetch('/properties', {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
             },
             body: JSON.stringify(form.value)
         })
