@@ -72,10 +72,10 @@
                 </div>
 
                 <div class="flex space-x-3 pt-4">
-                    <button type="button" @click="closeModal" class="btn-secondary flex-1">
+                    <button type="button" @click="closeModal" class="btn btn-secondary flex-1">
                         Cancel
                     </button>
-                    <button type="submit" :disabled="loading" class="btn-primary flex-1">
+                    <button type="submit" :disabled="loading" class="btn btn-primary flex-1">
                         Send Inquiry
                     </button>
                 </div>

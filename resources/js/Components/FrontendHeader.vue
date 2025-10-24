@@ -16,6 +16,14 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <!-- Control Panel Menu -->
+                    <a href="/dashboard" class="hidden sm:flex items-center px-3 py-2 text-sm font-medium text-sky-600 hover:text-sky-800 hover:bg-sky-50 border border-sky-200 hover:border-sky-300 rounded-lg transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                        Control Panel
+                    </a>
+                    
                     <!-- Notifications Button -->
                     <div class="relative">
                         <button 
@@ -162,6 +170,7 @@
                     <a href="/user/dashboard" :class="getMobileNavLinkClass('/user/dashboard')">Dashboard</a>
                     <a href="/marketplace" :class="getMobileNavLinkClass('/marketplace')">Browse Properties</a>
                     <a href="/user/favorites" :class="getMobileNavLinkClass('/user/favorites')">Favorites</a>
+                    <a href="/dashboard" :class="getMobileNavLinkClass('/dashboard')">Control Panel</a>
                 </div>
             </div>
         </div>

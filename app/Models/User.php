@@ -77,6 +77,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(LeadConversation::class, 'sender_id');
     }
 
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function favoriteProperties()
+    {
+        return $this->belongsToMany(Property::class, 'favorites');
+    }
+
     // Scopes
     public function scopeByOrganization($query, int $orgId)
     {

@@ -1,48 +1,35 @@
 <template>
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <!-- Navigation -->
-        <Header current-path="/invoices">
-            <template #action-button>
-                <div class="flex space-x-2">
-                    <button @click="showAddModal = true" class="btn btn-primary hidden sm:flex">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                        Create Invoice
-                    </button>
-                    <button @click="showBulkModal = true" class="btn btn-secondary hidden sm:flex">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        Bulk Generate
-                    </button>
-                </div>
-            </template>
-            <template #mobile-action-button>
-                <div class="space-y-2">
-                    <button @click="showAddModal = true" class="btn btn-primary w-full">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                        Create Invoice
-                    </button>
-                    <button @click="showBulkModal = true" class="btn btn-secondary w-full">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        Bulk Generate
-                    </button>
-                </div>
-            </template>
-        </Header>
+        <Header current-path="/invoices" />
 
         <!-- Main Content -->
         <div class="container-mobile py-6">
             <!-- Page Header -->
             <div class="px-4 py-6 sm:px-0">
                 <div class="mb-6">
-                    <h1 class="text-3xl font-bold text-gray-900">Invoices</h1>
-                    <p class="mt-2 text-gray-600">Manage invoices and track payments</p>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900">Invoices</h1>
+                            <p class="mt-2 text-gray-600">Manage invoices and track payments</p>
+                        </div>
+                        <div class="mt-4 sm:mt-0">
+                            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                                <button @click="showAddModal = true" class="btn btn-primary">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Create Invoice
+                                </button>
+                                <button @click="showBulkModal = true" class="btn btn-secondary">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    Bulk Generate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Stats Cards -->

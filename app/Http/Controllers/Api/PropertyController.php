@@ -152,9 +152,26 @@ class PropertyController extends Controller
     /**
      * Display the specified property
      */
-    public function show(Property $property): JsonResponse
+    public function show($id): JsonResponse
     {
-        $property->load(['organization', 'amenities', 'availability']);
+        $property = Property::find($id);
+        
+        if (!$property) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The property you\'re looking for doesn\'t exist or has been removed.',
+            ], 404);
+        }
+
+        // Check if property is published for public access
+        if (!$property->published) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The property you\'re looking for doesn\'t exist or has been removed.',
+            ], 404);
+        }
+
+        $property->load(['organization', 'amenities']);
 
         return response()->json([
             'success' => true,

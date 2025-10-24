@@ -104,6 +104,16 @@ class Property extends Model implements HasMedia
         return $this->hasMany(Document::class);
     }
 
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites');
+    }
+
     // Scopes
     public function scopePublished($query)
     {

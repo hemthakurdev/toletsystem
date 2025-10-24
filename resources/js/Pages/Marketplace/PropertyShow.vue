@@ -170,7 +170,7 @@
                             <div class="space-y-4">
                                 <button 
                                     @click="showLeadForm = true" 
-                                    class="btn-primary w-full"
+                                    class="btn btn-primary w-full"
                                 >
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -178,14 +178,14 @@
                                     Contact Owner
                                 </button>
 
-                                <button class="btn-secondary w-full">
+                                <button class="btn btn-secondary w-full">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                     </svg>
                                     Save Property
                                 </button>
 
-                                <button class="btn-secondary w-full">
+                                <button class="btn btn-secondary w-full">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                                     </svg>
@@ -254,7 +254,7 @@ const showLeadForm = ref(false)
 
 const loadProperty = async () => {
     try {
-        const response = await axios.get(`/api/v1/properties/${route.params.property}`)
+        const response = await axios.get(`/api/v1/properties/${page.props.id}`)
         
         if (response.data.success) {
             property.value = response.data.data

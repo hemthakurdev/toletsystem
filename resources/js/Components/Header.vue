@@ -12,7 +12,6 @@
                         <!-- Frontend User Control Panel Navigation -->
                         <template v-if="isFrontendUser">
                             <a href="/dashboard" :class="getNavLinkClass('/dashboard')">Dashboard</a>
-                            <a href="/user/profile" :class="getNavLinkClass('/user/profile')">Profile</a>
                             <a href="/user/favorites" :class="getNavLinkClass('/user/favorites')">Favorites</a>
                             <a href="/user/inquiries" :class="getNavLinkClass('/user/inquiries')">Inquiries</a>
                         </template>
@@ -27,6 +26,21 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <!-- Frontend Menu -->
+                    <a v-if="isFrontendUser" href="/user/dashboard" class="hidden sm:flex items-center px-3 py-2 text-sm font-medium text-sky-600 hover:text-sky-800 hover:bg-sky-50 border border-sky-200 hover:border-sky-300 rounded-lg transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                        Back to Frontend
+                    </a>
+                    
+                    <a v-if="!isFrontendUser" href="/" class="hidden sm:flex items-center px-3 py-2 text-sm font-medium text-sky-600 hover:text-sky-800 hover:bg-sky-50 border border-sky-200 hover:border-sky-300 rounded-lg transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                        Frontend
+                    </a>
+                    
                     <!-- Notifications Button -->
                     <div class="relative">
                         <button 
@@ -139,13 +153,6 @@
                             
                             <div class="border-t border-gray-100 my-1"></div>
                             
-                            <!-- Back to Frontend option for frontend users -->
-                            <a v-if="isFrontendUser" href="/user/dashboard" class="flex items-center px-4 py-2 text-sm text-sky-600 hover:bg-sky-50 transition-colors">
-                                <svg class="w-4 h-4 mr-3 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                </svg>
-                                Back to Frontend
-                            </a>
                             
                             <a href="/help" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                 <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

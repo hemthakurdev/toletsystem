@@ -265,31 +265,6 @@ Route::prefix('v1/webhooks')->group(function () {
     Route::get('stats', [\App\Http\Controllers\Api\WebhookController::class, 'getWebhookStats']);
 });
 
-// Frontend User API Routes
-Route::prefix('v1/user')->middleware(['auth:sanctum'])->group(function () {
-    Route::get('dashboard', function (Request $request) {
-        $user = $request->user();
-        
-        // Only allow frontend users
-        if ($user->user_type !== 'frontend') {
-            return response()->json(['success' => false, 'message' => 'Access denied'], 403);
-        }
-        
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'stats' => [
-                    'favorites' => 3, // Demo data
-                    'inquiries' => 2,
-                    'saved_searches' => 1,
-                    'recent_views' => 12
-                ],
-                'recent_favorites' => [],
-                'recent_inquiries' => []
-            ]
-        ]);
-    });
-});
 
 // Export download route (public)
 Route::prefix('v1/exports')->group(function () {

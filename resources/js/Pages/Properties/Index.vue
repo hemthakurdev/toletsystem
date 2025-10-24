@@ -1,24 +1,7 @@
 <template>
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <!-- Navigation -->
-        <Header current-path="/properties">
-            <template #action-button>
-                <button @click="showAddModal = true" class="btn btn-primary hidden sm:flex">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    Add Property
-                </button>
-            </template>
-            <template #mobile-action-button>
-                <button @click="showAddModal = true" class="btn btn-primary w-full">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    Add Property
-                </button>
-            </template>
-        </Header>
+        <Header current-path="/properties" />
 
         <!-- Main Content -->
         <div class="container-mobile py-6">
@@ -26,8 +9,20 @@
             <div class="mb-6">
                 <div class="card">
                     <div class="card-body">
-                        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Properties</h1>
-                        <p class="mt-2 text-gray-600">Manage your property portfolio</p>
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Properties</h1>
+                                <p class="mt-2 text-gray-600">Manage your property portfolio</p>
+                            </div>
+                            <div class="mt-4 sm:mt-0">
+                                <button @click="showAddModal = true" class="btn btn-primary">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Add Property
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

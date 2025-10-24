@@ -143,17 +143,27 @@
                         <div v-else class="space-y-4">
                             <div v-for="favorite in recentFavorites" :key="favorite.id" class="flex items-center space-x-4">
                                 <ImagePlaceholder 
-                                    :src="favorite.property?.images?.[0]"
-                                    :alt="favorite.property?.title"
+                                    :src="favorite.media && favorite.media.length > 0 ? favorite.media[0].original_url : null"
+                                    :alt="favorite.title"
                                     size="md"
                                     shape="rounded"
                                     className="flex-shrink-0"
                                 />
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="text-sm font-medium text-gray-900 truncate">{{ favorite.property?.title }}</h4>
-                                    <p class="text-sm text-gray-500">{{ favorite.property?.locality }}, {{ favorite.property?.city }}</p>
-                                    <p class="text-sm font-semibold text-sky-800">₹{{ formatPrice(favorite.property?.price) }}</p>
+                                    <h4 class="text-sm font-medium text-gray-900 truncate">{{ favorite.title }}</h4>
+                                    <p class="text-sm text-gray-500">{{ favorite.locality }}, {{ favorite.city }}</p>
+                                    <p class="text-sm font-semibold text-sky-800">₹{{ formatPrice(favorite.price) }}</p>
                                 </div>
+                                <div class="flex-shrink-0">
+                                    <a :href="`/properties/${favorite.id}`" class="text-sky-600 hover:text-sky-800 text-sm font-medium">
+                                        View →
+                                    </a>
+                                </div>
+                            </div>
+                            <div v-if="recentFavorites.length > 0" class="pt-4 border-t border-gray-200">
+                                <a href="/user/favorites" class="text-sky-600 hover:text-sky-800 text-sm font-medium">
+                                    View all favorites →
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -233,7 +243,7 @@ const formatPrice = (price) => {
 const loadDashboardData = async () => {
     try {
         // Load user dashboard data
-        const response = await axios.get('/api/v1/user/dashboard')
+        const response = await axios.get('/user/api/v1/user/dashboard')
         if (response.data.success) {
             stats.value = response.data.data.stats
             recentFavorites.value = response.data.data.recent_favorites || []

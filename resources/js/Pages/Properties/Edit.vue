@@ -1,23 +1,26 @@
 <template>
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <!-- Navigation -->
-        <Header current-path="/properties">
-            <template #action-button>
-                <a :href="`/properties/${props.property.id}`" class="btn btn-secondary">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    Back to Property
-                </a>
-            </template>
-        </Header>
+        <Header current-path="/properties" />
 
         <!-- Main Content -->
         <div class="container-mobile py-8">
             <div v-if="props.property" class="max-w-4xl mx-auto">
                 <!-- Header -->
                 <div class="bg-white rounded-xl shadow-soft p-6 mb-6">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Property</h1>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 mb-2">Edit Property</h1>
+                        </div>
+                        <div class="mt-4 sm:mt-0">
+                            <a :href="`/properties/${props.property.id}`" class="btn btn-secondary">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                                Back to Property
+                            </a>
+                        </div>
+                    </div>
                     <p class="text-gray-600">Update the property information below</p>
                 </div>
 

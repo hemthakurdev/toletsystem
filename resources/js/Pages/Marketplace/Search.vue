@@ -156,7 +156,7 @@
             <!-- Properties Grid/List -->
             <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div v-for="property in properties" :key="property.id" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
+                    <div class="relative h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
                         <img v-if="getPropertyImage(property)" 
                              :src="getPropertyImage(property)" 
                              :alt="property.title"
@@ -165,22 +165,27 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
+                        
+                        <!-- Favorite Button (only show for logged in users) -->
+                        <div v-if="$page.props.auth?.user" class="absolute top-3 right-3">
+                            <FavoriteButton :property-id="property.id" />
+                        </div>
                     </div>
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="text-lg font-semibold text-gray-900">{{ property.title }}</h3>
-                            <span v-if="property.is_featured" class="bg-sky-100 text-sky-900 text-xs font-semibold px-2 py-1 rounded-full">Featured</span>
+                            <span v-if="property.featured" class="bg-sky-100 text-sky-900 text-xs font-semibold px-2 py-1 rounded-full">Featured</span>
                         </div>
                         <p class="text-gray-600 text-sm mb-2">{{ property.locality }}, {{ property.city }}</p>
-                        <p class="text-gray-700 text-sm mb-4">{{ property.description.substring(0, 100) }}...</p>
+                        <p class="text-gray-700 text-sm mb-4">{{ property.short_description ? property.short_description.substring(0, 100) + '...' : 'No description available' }}</p>
                         <div class="flex justify-between items-center">
                             <div class="text-2xl font-bold text-sky-800">₹{{ formatPrice(property.price) }}</div>
-                            <div class="text-sm text-gray-500">{{ property.transaction_type }}</div>
+                            <div class="text-sm text-gray-500">{{ property.property_type }}</div>
                         </div>
                         <div class="mt-4 flex justify-between text-sm text-gray-600">
                             <span>{{ property.bedrooms }} Beds</span>
                             <span>{{ property.bathrooms }} Baths</span>
-                            <span>{{ property.area }} sq ft</span>
+                            <span>{{ property.area_sqft }} sq ft</span>
                         </div>
                         <div class="mt-4 flex space-x-2">
                             <button @click="viewProperty(property)" class="btn btn-primary flex-1">
@@ -198,7 +203,7 @@
             <div v-else class="space-y-4">
                 <div v-for="property in properties" :key="property.id" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                     <div class="flex">
-                        <div class="w-64 h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
+                        <div class="relative w-64 h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
                             <img v-if="getPropertyImage(property)" 
                                  :src="getPropertyImage(property)" 
                                  :alt="property.title"
@@ -207,23 +212,28 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
+                            
+                            <!-- Favorite Button (only show for logged in users) -->
+                            <div v-if="$page.props.auth?.user" class="absolute top-2 right-2">
+                                <FavoriteButton :property-id="property.id" />
+                            </div>
                         </div>
                         <div class="flex-1 p-6">
                             <div class="flex justify-between items-start mb-2">
                                 <h3 class="text-xl font-semibold text-gray-900">{{ property.title }}</h3>
                                 <div class="flex items-center space-x-2">
-                                    <span v-if="property.is_featured" class="bg-sky-100 text-sky-900 text-xs font-semibold px-2 py-1 rounded-full">Featured</span>
+                                    <span v-if="property.featured" class="bg-sky-100 text-sky-900 text-xs font-semibold px-2 py-1 rounded-full">Featured</span>
                                     <div class="text-2xl font-bold text-sky-800">₹{{ formatPrice(property.price) }}</div>
                                 </div>
                             </div>
                             <p class="text-gray-600 mb-2">{{ property.locality }}, {{ property.city }}</p>
-                            <p class="text-gray-700 mb-4">{{ property.description }}</p>
+                            <p class="text-gray-700 mb-4">{{ property.short_description || 'No description available' }}</p>
                             <div class="flex justify-between items-center">
                                 <div class="flex space-x-6 text-sm text-gray-600">
                                     <span>{{ property.bedrooms }} Beds</span>
                                     <span>{{ property.bathrooms }} Baths</span>
-                                    <span>{{ property.area }} sq ft</span>
-                                    <span>{{ property.transaction_type }}</span>
+                                    <span>{{ property.area_sqft }} sq ft</span>
+                                    <span>{{ property.property_type }}</span>
                                 </div>
                                 <div class="flex space-x-2">
                                     <button @click="viewProperty(property)" class="btn btn-primary">
@@ -255,6 +265,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import FrontendHeader from '../../Components/FrontendHeader.vue'
+import FavoriteButton from '../../Components/FavoriteButton.vue'
 
 const properties = ref([])
 const cities = ref([])

@@ -1,22 +1,23 @@
 <template>
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <!-- Navigation -->
-        <Header current-path="/properties">
-            <template #action-button>
-                <a href="/properties" class="btn btn-secondary">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    Back to Properties
-                </a>
-            </template>
-        </Header>
+        <Header current-path="/properties" />
 
         <!-- Main Content -->
         <div class="container-mobile py-8">
             <div v-if="props.property" class="max-w-6xl mx-auto">
                 <!-- Property Header -->
                 <div class="bg-white rounded-xl shadow-soft p-6 mb-6">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
+                        <div class="flex-1">
+                            <a href="/properties" class="btn btn-secondary mb-4">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                                Back to Properties
+                            </a>
+                        </div>
+                    </div>
                     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                         <div>
                             <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ props.property.title }}</h1>

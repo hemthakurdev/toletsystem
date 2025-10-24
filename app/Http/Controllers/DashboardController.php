@@ -12,6 +12,55 @@ class DashboardController extends Controller
     public function index(Request $request): Response
     {
         $user = Auth::user();
+        
+        // Check if user is a frontend user (no organization)
+        if ($user->user_type === 'frontend' || !$user->organization) {
+            return $this->frontendUserDashboard($user);
+        }
+        
+        // Organization user dashboard
+        return $this->organizationUserDashboard($user);
+    }
+    
+    private function frontendUserDashboard($user): Response
+    {
+        // Get frontend user dashboard statistics
+        $stats = [
+            'total_favorites' => 0, // Will be implemented when favorites are added
+            'total_inquiries' => 0, // Will be implemented when inquiries are added
+            'saved_searches' => 0, // Will be implemented when saved searches are added
+            'recent_views' => 0, // Will be implemented when view tracking is added
+        ];
+
+        // Get recent activity for frontend user
+        $recentActivity = collect([
+            [
+                'id' => 1,
+                'message' => 'Welcome to your dashboard!',
+                'type' => 'info',
+                'created_at' => now(),
+            ]
+        ]);
+
+        // Get upcoming tasks for frontend user
+        $upcomingTasks = collect([
+            [
+                'id' => 1,
+                'description' => 'Complete your profile',
+                'due_date' => now()->addDays(7),
+            ]
+        ]);
+
+        return Inertia::render('Dashboard', [
+            'stats' => $stats,
+            'recentActivity' => $recentActivity,
+            'upcomingTasks' => $upcomingTasks,
+            'userType' => 'frontend',
+        ]);
+    }
+    
+    private function organizationUserDashboard($user): Response
+    {
         $organization = $user->organization;
 
         // Get dashboard statistics
@@ -67,6 +116,7 @@ class DashboardController extends Controller
             'stats' => $stats,
             'recentActivity' => $recentActivity,
             'upcomingTasks' => $upcomingTasks,
+            'userType' => 'organization',
         ]);
     }
 

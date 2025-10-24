@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -155,7 +156,7 @@ Route::get('/marketplace', function () {
     return Inertia::render('Marketplace/Search');
 })->name('marketplace.search');
 
-Route::get('/marketplace/properties/{property}', function ($id) {
+Route::get('/marketplace/properties/{id}', function ($id) {
     return Inertia::render('Marketplace/PropertyShow', ['id' => $id]);
 })->name('marketplace.property.show');
 
@@ -208,6 +209,53 @@ Route::prefix('user')->group(function () {
         Route::get('dashboard', function () {
             return Inertia::render('User/Dashboard');
         })->name('user.dashboard');
+        Route::get('favorites', function () {
+            return Inertia::render('User/Favorites');
+        })->name('user.favorites');
+        
+        // Favorites API Routes (for session-based authentication)
+        Route::prefix('api/v1/user/favorites')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\V1\FavoritesController::class, 'index']);
+            Route::post('/', [\App\Http\Controllers\Api\V1\FavoritesController::class, 'store']);
+            Route::delete('/{propertyId}', [\App\Http\Controllers\Api\V1\FavoritesController::class, 'destroy']);
+            Route::post('/toggle', [\App\Http\Controllers\Api\V1\FavoritesController::class, 'toggle']);
+            Route::get('/check/{propertyId}', [\App\Http\Controllers\Api\V1\FavoritesController::class, 'check']);
+            Route::get('/count', [\App\Http\Controllers\Api\V1\FavoritesController::class, 'count']);
+        });
+        
+        // User Dashboard API Route
+        Route::get('api/v1/user/dashboard', function (Request $request) {
+            $user = $request->user();
+            
+            // Only allow frontend users
+            if ($user->user_type !== 'frontend') {
+                return response()->json(['success' => false, 'message' => 'Access denied'], 403);
+            }
+            
+            // Get real favorites count
+            $favoritesCount = $user->favorites()->count();
+            
+            // Get recent favorites (last 3)
+            $recentFavorites = $user->favoriteProperties()
+                ->with(['organization', 'media'])
+                ->latest('favorites.created_at')
+                ->limit(3)
+                ->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'stats' => [
+                        'favorites' => $favoritesCount,
+                        'inquiries' => 2, // TODO: Implement inquiries count
+                        'saved_searches' => 1, // TODO: Implement saved searches count
+                        'recent_views' => 12 // TODO: Implement recent views count
+                    ],
+                    'recent_favorites' => $recentFavorites,
+                    'recent_inquiries' => [] // TODO: Implement recent inquiries
+                ]
+            ]);
+        });
     });
 });
 

@@ -25,31 +25,116 @@
             <div class="mb-8">
                 <div class="card">
                     <div class="card-body">
-                        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Welcome to SaleMitra Dashboard</h1>
-                        <p class="text-gray-600">Manage your properties, tenants, and finances all in one place.</p>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                            {{ props.userType === 'frontend' ? 'Welcome to Your Dashboard' : 'Welcome to SaleMitra Dashboard' }}
+                        </h1>
+                        <p class="text-gray-600">
+                            {{ props.userType === 'frontend' 
+                                ? 'Track your favorites, inquiries, and property searches.' 
+                                : 'Manage your properties, tenants, and finances all in one place.' 
+                            }}
+                        </p>
                     </div>
                 </div>
             </div>
             
             <!-- Main Stats -->
             <div class="grid-responsive mb-8">
-                <div class="stat-card group cursor-pointer">
-                    <div class="icon-container icon-sky mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                    </div>
-                    <div class="stat-number">{{ props.stats.total_properties }}</div>
-                    <div class="stat-label">Total Properties</div>
-                    <div class="mt-2 text-xs text-emerald-600 font-medium">
-                        <span class="inline-flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                <!-- Frontend User Stats -->
+                <template v-if="props.userType === 'frontend'">
+                    <div class="stat-card group cursor-pointer">
+                        <div class="icon-container icon-sky mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                             </svg>
-                            +12% this month
-                        </span>
+                        </div>
+                        <div class="stat-number">{{ props.stats.total_favorites }}</div>
+                        <div class="stat-label">Favorites</div>
+                        <div class="mt-2 text-xs text-emerald-600 font-medium">
+                            <span class="inline-flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                Saved properties
+                            </span>
+                        </div>
                     </div>
-                </div>
+                    
+                    <div class="stat-card group cursor-pointer">
+                        <div class="icon-container icon-emerald mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-number">{{ props.stats.total_inquiries }}</div>
+                        <div class="stat-label">Inquiries</div>
+                        <div class="mt-2 text-xs text-emerald-600 font-medium">
+                            <span class="inline-flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                Messages sent
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card group cursor-pointer">
+                        <div class="icon-container icon-amber mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-number">{{ props.stats.saved_searches }}</div>
+                        <div class="stat-label">Saved Searches</div>
+                        <div class="mt-2 text-xs text-emerald-600 font-medium">
+                            <span class="inline-flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                Active alerts
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card group cursor-pointer">
+                        <div class="icon-container icon-purple mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-number">{{ props.stats.recent_views }}</div>
+                        <div class="stat-label">Recent Views</div>
+                        <div class="mt-2 text-xs text-emerald-600 font-medium">
+                            <span class="inline-flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                This week
+                            </span>
+                        </div>
+                    </div>
+                </template>
+                
+                <!-- Organization User Stats -->
+                <template v-else>
+                    <div class="stat-card group cursor-pointer">
+                        <div class="icon-container icon-sky mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-number">{{ props.stats.total_properties }}</div>
+                        <div class="stat-label">Total Properties</div>
+                        <div class="mt-2 text-xs text-emerald-600 font-medium">
+                            <span class="inline-flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                +12% this month
+                            </span>
+                        </div>
+                    </div>
                 
                 <div class="stat-card group cursor-pointer">
                     <div class="icon-container icon-emerald mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -104,9 +189,11 @@
                         </span>
                     </div>
                 </div>
+                </template>
             </div>
 
             <!-- Secondary Stats -->
+            <template v-if="props.userType !== 'frontend'">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div class="stat-card">
                     <div class="stat-number text-purple-600">{{ props.stats.total_tenants || 0 }}</div>
@@ -205,6 +292,7 @@
                     </div>
                 </div>
             </div>
+            </template>
         </div>
     </div>
 </template>
@@ -245,6 +333,10 @@ const props = defineProps({
     upcomingTasks: {
         type: Array,
         default: () => []
+    },
+    userType: {
+        type: String,
+        default: 'organization'
     }
 })
 
