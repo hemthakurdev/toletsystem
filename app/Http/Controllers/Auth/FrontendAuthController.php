@@ -121,6 +121,9 @@ class FrontendAuthController extends Controller
         // Log the user in
         Auth::login($user, $remember);
 
+        // Create Sanctum token for API access
+        $token = $user->createToken('frontend-token')->plainTextToken;
+
         // Update last login
         $user->updateLastLogin();
 
@@ -135,6 +138,7 @@ class FrontendAuthController extends Controller
             'message' => 'Login successful!',
             'data' => [
                 'user' => $user,
+                'token' => $token,
             ],
         ]);
     }

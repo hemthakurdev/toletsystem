@@ -10,9 +10,20 @@ use App\Models\Property;
 
 class PropertiesController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $user = Auth::user();
+        
+        // Check if user is a frontend user
+        if ($user->user_type === 'frontend') {
+            return redirect()->route('marketplace.search');
+        }
+        
+        // For organization users, check if they have an organization
+        if (!$user->organization) {
+            abort(403, 'You must be part of an organization to access this page.');
+        }
+        
         $organization = $user->organization;
 
         // Get properties for the organization
@@ -50,9 +61,20 @@ class PropertiesController extends Controller
         return Inertia::render('Properties/Create');
     }
 
-    public function show($id): Response
+    public function show($id)
     {
         $user = Auth::user();
+        
+        // Check if user is a frontend user
+        if ($user->user_type === 'frontend') {
+            return redirect()->route('marketplace.property.show', ['id' => $id]);
+        }
+        
+        // For organization users, check if they have an organization
+        if (!$user->organization) {
+            abort(403, 'You must be part of an organization to access this page.');
+        }
+        
         $organization = $user->organization;
 
         $property = $organization->properties()
@@ -67,6 +89,17 @@ class PropertiesController extends Controller
     public function edit($id): Response
     {
         $user = Auth::user();
+        
+        // Check if user is a frontend user
+        if ($user->user_type === 'frontend') {
+            abort(403, 'Frontend users cannot edit properties.');
+        }
+        
+        // For organization users, check if they have an organization
+        if (!$user->organization) {
+            abort(403, 'You must be part of an organization to access this page.');
+        }
+        
         $organization = $user->organization;
 
         $property = $organization->properties()->findOrFail($id);
@@ -79,6 +112,17 @@ class PropertiesController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
+        
+        // Check if user is a frontend user
+        if ($user->user_type === 'frontend') {
+            abort(403, 'Frontend users cannot update properties.');
+        }
+        
+        // For organization users, check if they have an organization
+        if (!$user->organization) {
+            abort(403, 'You must be part of an organization to access this page.');
+        }
+        
         $organization = $user->organization;
 
         $property = $organization->properties()->findOrFail($id);
@@ -124,6 +168,17 @@ class PropertiesController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
+        
+        // Check if user is a frontend user
+        if ($user->user_type === 'frontend') {
+            abort(403, 'Frontend users cannot delete properties.');
+        }
+        
+        // For organization users, check if they have an organization
+        if (!$user->organization) {
+            abort(403, 'You must be part of an organization to access this page.');
+        }
+        
         $organization = $user->organization;
 
         $property = $organization->properties()->findOrFail($id);
@@ -138,6 +193,17 @@ class PropertiesController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
+        
+        // Check if user is a frontend user
+        if ($user->user_type === 'frontend') {
+            abort(403, 'Frontend users cannot create properties.');
+        }
+        
+        // For organization users, check if they have an organization
+        if (!$user->organization) {
+            abort(403, 'You must be part of an organization to access this page.');
+        }
+        
         $organization = $user->organization;
 
         $validated = $request->validate([

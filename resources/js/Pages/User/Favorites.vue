@@ -230,6 +230,7 @@ const loadFavorites = async (page = 1, append = false) => {
         }
     } catch (error) {
         console.error('Error loading favorites:', error)
+        console.error('Error response:', error.response?.data)
         // Handle error - could show toast notification
     } finally {
         loading.value = false

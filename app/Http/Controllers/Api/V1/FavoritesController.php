@@ -16,7 +16,15 @@ class FavoritesController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $user = Auth::user();
+        // Try to get user from Sanctum token first, then from session
+        $user = $request->user() ?? Auth::user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated'
+            ], 401);
+        }
         
         $favorites = $user->favoriteProperties()
             ->with(['organization', 'media'])
@@ -46,7 +54,15 @@ class FavoritesController extends Controller
             'property_id' => 'required|exists:properties,id'
         ]);
 
-        $user = Auth::user();
+        $user = $request->user() ?? Auth::user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated'
+            ], 401);
+        }
+        
         $propertyId = $request->property_id;
 
         // Check if already favorited
@@ -78,7 +94,14 @@ class FavoritesController extends Controller
      */
     public function destroy(Request $request, $propertyId): JsonResponse
     {
-        $user = Auth::user();
+        $user = $request->user() ?? Auth::user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated'
+            ], 401);
+        }
 
         $favorite = Favorite::where('user_id', $user->id)
             ->where('property_id', $propertyId)
@@ -108,7 +131,15 @@ class FavoritesController extends Controller
             'property_id' => 'required|exists:properties,id'
         ]);
 
-        $user = Auth::user();
+        $user = $request->user() ?? Auth::user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated'
+            ], 401);
+        }
+        
         $propertyId = $request->property_id;
 
         $favorite = Favorite::where('user_id', $user->id)
@@ -142,7 +173,14 @@ class FavoritesController extends Controller
      */
     public function check(Request $request, $propertyId): JsonResponse
     {
-        $user = Auth::user();
+        $user = $request->user() ?? Auth::user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated'
+            ], 401);
+        }
 
         $isFavorited = Favorite::where('user_id', $user->id)
             ->where('property_id', $propertyId)
@@ -161,7 +199,15 @@ class FavoritesController extends Controller
      */
     public function count(): JsonResponse
     {
-        $user = Auth::user();
+        $user = $request->user() ?? Auth::user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated'
+            ], 401);
+        }
+        
         $count = $user->favorites()->count();
 
         return response()->json([

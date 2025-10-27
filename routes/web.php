@@ -214,7 +214,7 @@ Route::prefix('user')->group(function () {
         })->name('user.favorites');
         
         // Favorites API Routes (for session-based authentication)
-        Route::prefix('api/v1/user/favorites')->group(function () {
+        Route::prefix('api/v1/user/favorites')->middleware(['auth:sanctum,web'])->group(function () {
             Route::get('/', [\App\Http\Controllers\Api\V1\FavoritesController::class, 'index']);
             Route::post('/', [\App\Http\Controllers\Api\V1\FavoritesController::class, 'store']);
             Route::delete('/{propertyId}', [\App\Http\Controllers\Api\V1\FavoritesController::class, 'destroy']);
