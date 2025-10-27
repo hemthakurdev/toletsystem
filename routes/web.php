@@ -160,6 +160,20 @@ Route::get('/marketplace/properties/{id}', function ($id) {
     return Inertia::render('Marketplace/PropertyShow', ['id' => $id]);
 })->name('marketplace.property.show');
 
+Route::get('/marketplace/properties/{property}/contact', [App\Http\Controllers\Marketplace\PropertyContactController::class, 'create'])
+    ->name('marketplace.property.contact');
+
+Route::post('/marketplace/properties/{property}/contact', [App\Http\Controllers\Marketplace\PropertyContactController::class, 'store'])
+    ->name('marketplace.property.contact.store');
+
+// Property Comparison Route
+
+Route::get('/marketplace/properties/{property}/contact', [App\Http\Controllers\Marketplace\PropertyContactController::class, 'create'])
+    ->name('marketplace.property.contact');
+
+Route::post('/marketplace/properties/{property}/contact', [App\Http\Controllers\Marketplace\PropertyContactController::class, 'store'])
+    ->name('marketplace.property.contact.store');
+
 // Property Comparison Route
 Route::get('/compare', function () {
     return Inertia::render('Compare/Index');
@@ -212,6 +226,7 @@ Route::prefix('user')->group(function () {
         Route::get('favorites', function () {
             return Inertia::render('User/Favorites');
         })->name('user.favorites');
+        Route::get('inquiries', [App\Http\Controllers\UserInquiryController::class, 'index'])->name('user.inquiries');
         
         // Favorites API Routes (for session-based authentication)
         Route::prefix('api/v1/user/favorites')->middleware(['auth:sanctum,web'])->group(function () {
