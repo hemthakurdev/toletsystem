@@ -45,39 +45,52 @@
 
                 <!-- Filters -->
                 <div class="card mb-6">
-                    <div class="flex flex-wrap items-center gap-4">
-                        <div class="flex-1 min-w-64">
+                    <div class="flex items-center gap-3 flex-wrap md:flex-nowrap px-4 md:px-6 py-4">
+                        <div class="w-full md:w-80">
                             <input
                                 v-model="filters.search"
                                 type="text"
                                 placeholder="Search leads..."
-                                class="form-input"
+                                class="form-input w-full"
                                 @input="debouncedSearch"
                             />
                         </div>
-                        <select v-model="filters.status" @change="loadLeads" class="form-select">
-                            <option value="">All Status</option>
-                            <option value="new">New</option>
-                            <option value="contacted">Contacted</option>
-                            <option value="interested">Interested</option>
-                            <option value="not_interested">Not Interested</option>
-                            <option value="converted">Converted</option>
-                        </select>
-                        <select v-model="filters.source" @change="loadLeads" class="form-select">
-                            <option value="">All Sources</option>
-                            <option value="public_listing">Public Listing</option>
-                            <option value="manual">Manual</option>
-                            <option value="referral">Referral</option>
-                        </select>
-                        <label class="flex items-center">
+                        <div class="w-full md:w-44">
+                            <select v-model="filters.status" @change="loadLeads" class="form-select w-full">
+                                <option value="">All Status</option>
+                                <option value="new">New</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="interested">Interested</option>
+                                <option value="not_interested">Not Interested</option>
+                                <option value="converted">Converted</option>
+                            </select>
+                        </div>
+                        <div class="w-full md:w-48">
+                            <select v-model="filters.source" @change="loadLeads" class="form-select w-full">
+                                <option value="">All Sources</option>
+                                <option value="public_listing">Public Listing</option>
+                                <option value="manual">Manual</option>
+                                <option value="referral">Referral</option>
+                            </select>
+                        </div>
+                        <label class="flex items-center whitespace-nowrap">
                             <input v-model="filters.high_priority" type="checkbox" @change="loadLeads" class="mr-2">
                             High Priority Only
                         </label>
+                        <div class="ml-auto">
+                            <button @click="refreshData" class="btn btn-secondary">Apply</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Leads Table -->
                 <div class="card">
+                    <!-- Table help text -->
+                    <div class="px-6 py-3 bg-sky-50 border-b border-sky-100 text-sm text-sky-900">
+                        <span class="font-medium">Actions guide:</span>
+                        <span class="ml-2"><span class="font-semibold">Contact</span> marks a lead as contacted and updates the lead score.</span>
+                        <span class="ml-2"><span class="font-semibold">Convert</span> marks a contacted lead as converted to a tenant/customer.</span>
+                    </div>
                     <div v-if="loading" class="text-center py-8">
                         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-sky-800"></div>
                         <p class="mt-2 text-gray-600">Loading leads...</p>
@@ -188,7 +201,6 @@
 
         <!-- Lead Detail Modal -->
         <LeadDetailModal 
-            v-if="showLeadModal" 
             :show="showLeadModal" 
             :lead="selectedLead"
             @close="closeLeadModal"
@@ -201,11 +213,35 @@
 import { ref, onMounted } from 'vue'
 import Header from '../../Components/Header.vue'
 import axios from 'axios'
+
+// Helper to build axios config supporting either token-based auth (SPA) or cookie-based session (Laravel Sanctum)
+const getAuthConfig = () => {
+    const token = localStorage.getItem('token')
+    if (token) {
+        return {
+            headers: { 'Authorization': 'Bearer ' + token }
+        }
+    }
+    // use cookies (Sanctum/session) for session auth
+    return { withCredentials: true }
+}
+
+// Determine base paths for token (SPA) and session (web), with auto-fallback between them
+const hasToken = !!localStorage.getItem('token')
+const apiLeadsPath = '/api/v1/leads'
+const webLeadsPath = '/org/leads'
+const activeLeadsBasePath = ref(hasToken ? apiLeadsPath : webLeadsPath)
 import LeadDetailModal from './LeadDetailModal.vue'
 
 const leads = ref([])
 const stats = ref({})
 const loading = ref(false)
+const lastApiStatus = ref(null)
+const lastApiError = ref(null)
+const rawApiResponse = ref(null)
+const rawLeadsResponse = ref(null)
+const rawStatsResponse = ref(null)
+const showRawResponse = ref(false)
 const showLeadModal = ref(false)
 const selectedLead = ref(null)
 const pagination = ref(null)
@@ -229,29 +265,92 @@ const debouncedSearch = () => {
 const loadLeads = async (page = 1) => {
     loading.value = true
     try {
-        const params = new URLSearchParams({
-            page: page,
-            ...filters.value
-        })
+        // Build query params, omitting empty filters so backend doesn't filter by empty values
+        const paramsObj = { page }
+        const f = filters.value
+        if (f.search && f.search.trim().length > 0) paramsObj.search = f.search.trim()
+        if (f.status) paramsObj.status = f.status
+        if (f.source) paramsObj.source = f.source
+        if (f.high_priority === true) paramsObj.high_priority = '1'
+        const params = new URLSearchParams(paramsObj)
 
-        const response = await axios.get(`http://127.0.0.1:8000/api/v1/org/leads?${params}`, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
-        })
+        const tryFetch = async (base) => {
+            return await axios.get(`${base}?${params}`, getAuthConfig())
+        }
 
-        if (response.data.success) {
-            leads.value = response.data.data.data
-            pagination.value = {
-                current_page: response.data.data.current_page,
-                last_page: response.data.data.last_page,
-                from: response.data.data.from,
-                to: response.data.data.to,
-                total: response.data.data.total
+        let response
+        try {
+            response = await tryFetch(activeLeadsBasePath.value)
+        } catch (e) {
+            // Fallback to the other base if first fails
+            const fallback = activeLeadsBasePath.value === apiLeadsPath ? webLeadsPath : apiLeadsPath
+            response = await tryFetch(fallback)
+            activeLeadsBasePath.value = fallback
+        }
+
+        lastApiStatus.value = response.status
+        rawLeadsResponse.value = response.data
+        rawApiResponse.value = response.data
+
+        if (response.data?.success) {
+            const payload = response.data.data
+            if (payload && Array.isArray(payload.data)) {
+                leads.value = payload.data
+                pagination.value = {
+                    current_page: payload.current_page,
+                    last_page: payload.last_page,
+                    from: payload.from,
+                    to: payload.to,
+                    total: payload.total
+                }
+            } else if (Array.isArray(payload)) {
+                leads.value = payload
+                pagination.value = null
+            } else if (payload && Array.isArray(payload.data ?? payload)) {
+                leads.value = payload.data ?? payload
+                pagination.value = null
+            } else {
+            // Unexpected shape, keep UI stable
+                leads.value = []
+                pagination.value = null
             }
+            lastApiError.value = null
+
+            // If token path returned empty, attempt web path once to populate
+            if (hasToken && activeLeadsBasePath.value === apiLeadsPath && leads.value.length === 0) {
+                try {
+                    const fb = await tryFetch(webLeadsPath)
+                    if (fb.data?.success) {
+                        const payload2 = fb.data.data
+                        if (payload2 && Array.isArray(payload2.data)) {
+                            leads.value = payload2.data
+                            pagination.value = {
+                                current_page: payload2.current_page,
+                                last_page: payload2.last_page,
+                                from: payload2.from,
+                                to: payload2.to,
+                                total: payload2.total
+                            }
+                        } else if (Array.isArray(payload2)) {
+                            leads.value = payload2
+                            pagination.value = null
+                        } else if (payload2 && Array.isArray(payload2.data ?? payload2)) {
+                            leads.value = payload2.data ?? payload2
+                            pagination.value = null
+                        }
+                        activeLeadsBasePath.value = webLeadsPath
+                    }
+                } catch (_) {}
+            }
+        } else {
+            lastApiError.value = response.data?.message || 'Failed to load leads'
         }
     } catch (error) {
-        console.error('Error loading leads:', error)
+        // Swallow noisy console in production UI
+        lastApiStatus.value = error.response?.status || null
+        lastApiError.value = error.response?.data?.message || error.message || 'Unknown error'
+        rawApiResponse.value = error.response?.data ?? { error: error.message }
+        rawLeadsResponse.value = error.response?.data ?? null
     } finally {
         loading.value = false
     }
@@ -259,17 +358,23 @@ const loadLeads = async (page = 1) => {
 
 const loadStatistics = async () => {
     try {
-        const response = await axios.get('http://127.0.0.1:8000/api/v1/org/leads/statistics', {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
+        try {
+            const response = await axios.get(`${activeLeadsBasePath.value}/statistics`, getAuthConfig())
+            lastApiStatus.value = response.status
+            rawStatsResponse.value = response.data
+            rawApiResponse.value = response.data
+            if (response.data.success) {
+                stats.value = response.data.data
             }
-        })
-
-        if (response.data.success) {
-            stats.value = response.data.data
+        } catch (e) {
+            // Swallow noisy console in production UI
+            lastApiStatus.value = e.response?.status || null
+            lastApiError.value = e.response?.data?.message || e.message || 'Unknown error'
+            rawApiResponse.value = e.response?.data ?? { error: e.message }
+            rawStatsResponse.value = e.response?.data ?? null
         }
     } catch (error) {
-        console.error('Error loading statistics:', error)
+        // Swallow noisy console in production UI
     }
 }
 
@@ -295,11 +400,7 @@ const onLeadUpdated = () => {
 
 const markContacted = async (lead) => {
     try {
-        const response = await axios.post(`http://127.0.0.1:8000/api/v1/org/leads/${lead.id}/mark-contacted`, {}, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
-        })
+    const response = await axios.post(`${activeLeadsBasePath.value}/${lead.id}/mark-contacted`, {}, getAuthConfig())
 
         if (response.data.success) {
             lead.status = 'contacted'
@@ -307,25 +408,21 @@ const markContacted = async (lead) => {
             lead.lead_score = response.data.data.lead_score
         }
     } catch (error) {
-        console.error('Error marking lead as contacted:', error)
+        // Swallow noisy console in production UI
         alert('Failed to update lead status')
     }
 }
 
 const markConverted = async (lead) => {
     try {
-        const response = await axios.post(`http://127.0.0.1:8000/api/v1/org/leads/${lead.id}/mark-converted`, {}, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
-        })
+    const response = await axios.post(`${activeLeadsBasePath.value}/${lead.id}/mark-converted`, {}, getAuthConfig())
 
         if (response.data.success) {
             lead.status = 'converted'
             lead.lead_score = response.data.data.lead_score
         }
     } catch (error) {
-        console.error('Error marking lead as converted:', error)
+        // Swallow noisy console in production UI
         alert('Failed to update lead status')
     }
 }
@@ -334,18 +431,14 @@ const deleteLead = async (lead) => {
     if (!confirm('Are you sure you want to delete this lead?')) return
 
     try {
-        const response = await axios.delete(`http://127.0.0.1:8000/api/v1/org/leads/${lead.id}`, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
-        })
+    const response = await axios.delete(`${activeLeadsBasePath.value}/${lead.id}`, getAuthConfig())
 
         if (response.data.success) {
             leads.value = leads.value.filter(l => l.id !== lead.id)
             loadStatistics()
         }
     } catch (error) {
-        console.error('Error deleting lead:', error)
+        // Swallow noisy console in production UI
         alert('Failed to delete lead')
     }
 }

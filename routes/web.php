@@ -102,7 +102,19 @@ Route::get('/invoices/{invoice}/edit', function ($id) {
 
 Route::get('/leads', function () {
     return Inertia::render('Leads/Index');
-})->name('leads.index');
+})->middleware(['auth'])->name('leads.index');
+
+// Web JSON endpoints for leads (useful when user is session-authenticated)
+Route::prefix('org')->middleware(['auth'])->group(function () {
+    Route::get('leads', [\App\Http\Controllers\Api\LeadController::class, 'index']);
+    Route::get('leads/statistics', [\App\Http\Controllers\Api\LeadController::class, 'statistics']);
+    Route::get('leads/{lead}', [\App\Http\Controllers\Api\LeadController::class, 'show']);
+    Route::post('leads/{lead}/conversations', [\App\Http\Controllers\Api\LeadController::class, 'addConversation']);
+    Route::post('leads/{lead}/mark-contacted', [\App\Http\Controllers\Api\LeadController::class, 'markContacted']);
+    Route::post('leads/{lead}/mark-converted', [\App\Http\Controllers\Api\LeadController::class, 'markConverted']);
+    Route::post('leads/{lead}/mark-not-interested', [\App\Http\Controllers\Api\LeadController::class, 'markNotInterested']);
+    Route::delete('leads/{lead}', [\App\Http\Controllers\Api\LeadController::class, 'destroy']);
+});
 
 Route::get('/leads/create', function () {
     return Inertia::render('Leads/Create');

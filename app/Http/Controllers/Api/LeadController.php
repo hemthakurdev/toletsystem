@@ -124,8 +124,11 @@ class LeadController extends Controller
      */
     public function show(Lead $lead): JsonResponse
     {
-        // Check if user has access to this lead
-        if ($lead->org_id !== auth()->user()->org_id) {
+        // Check if user has access to this lead (org member) OR lead owner (frontend user)
+        $user = auth()->user();
+        $isOrgUser = $user && $lead->org_id === $user->org_id;
+        $isLeadOwner = $user && ($lead->user_id === $user->id);
+        if (!$isOrgUser && !$isLeadOwner) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access to lead',
@@ -145,8 +148,11 @@ class LeadController extends Controller
      */
     public function update(Request $request, Lead $lead): JsonResponse
     {
-        // Check if user has access to this lead
-        if ($lead->org_id !== auth()->user()->org_id) {
+        // Check if user has access to this lead (org member) OR lead owner (frontend user)
+        $user = auth()->user();
+        $isOrgUser = $user && $lead->org_id === $user->org_id;
+        $isLeadOwner = $user && $lead->user_id === $user->id;
+        if (!$isOrgUser && !$isLeadOwner) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access to lead',
@@ -208,8 +214,11 @@ class LeadController extends Controller
      */
     public function destroy(Lead $lead): JsonResponse
     {
-        // Check if user has access to this lead
-        if ($lead->org_id !== auth()->user()->org_id) {
+        // Allow org member (same org) OR lead owner (frontend user) to cancel/delete
+        $user = auth()->user();
+        $isOrgUser = $user && $lead->org_id === $user->org_id;
+        $isLeadOwner = $user && $lead->user_id === $user->id;
+        if (!$isOrgUser && !$isLeadOwner) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access to lead',
@@ -333,8 +342,11 @@ class LeadController extends Controller
      */
     public function addConversation(Request $request, Lead $lead): JsonResponse
     {
-        // Check if user has access to this lead
-        if ($lead->org_id !== auth()->user()->org_id) {
+        // Check if user has access to this lead (org member) OR lead owner (frontend user)
+        $user = auth()->user();
+        $isOrgUser = $user && $lead->org_id === $user->org_id;
+        $isLeadOwner = $user && ($lead->user_id === $user->id);
+        if (!$isOrgUser && !$isLeadOwner) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access to lead',
@@ -354,9 +366,12 @@ class LeadController extends Controller
         }
 
         try {
+            $user = auth()->user();
+            $senderType = (($user->user_type ?? null) === 'frontend') ? 'tenant' : 'owner';
+
             $conversation = $lead->addConversation(
                 $request->message,
-                'user',
+                $senderType,
                 auth()->id()
             );
 

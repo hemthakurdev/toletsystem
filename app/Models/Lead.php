@@ -25,6 +25,7 @@ class Lead extends Model
         'lead_score',
         'contacted_at',
         'notes',
+        'user_id', // ensure frontend user linkage can be saved
     ];
 
     protected $casts = [

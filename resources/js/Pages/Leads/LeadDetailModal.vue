@@ -1,5 +1,5 @@
 <template>
-    <div v-if="show" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+    <div v-if="show" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[1000] p-4" role="dialog" aria-modal="true">
         <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
             <!-- Header -->
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
@@ -124,34 +124,34 @@
                                 <button 
                                     v-if="lead?.status === 'new'" 
                                     @click="markContacted" 
-                                    class="btn-success"
+                                    class="btn btn-success"
                                 >
                                     Mark as Contacted
                                 </button>
                                 <button 
                                     v-if="lead?.status === 'contacted'" 
                                     @click="markConverted" 
-                                    class="btn-primary"
+                                    class="btn btn-primary"
                                 >
                                     Mark as Converted
                                 </button>
                                 <button 
                                     v-if="lead?.status !== 'not_interested'" 
                                     @click="markNotInterested" 
-                                    class="btn-danger"
+                                    class="btn btn-danger"
                                 >
                                     Mark as Not Interested
                                 </button>
                                 <a 
                                     :href="`tel:${lead?.phone}`" 
-                                    class="btn-secondary"
+                                    class="btn btn-secondary"
                                 >
                                     Call
                                 </a>
                                 <a 
                                     v-if="lead?.email" 
                                     :href="`mailto:${lead?.email}`" 
-                                    class="btn-secondary"
+                                    class="btn btn-secondary"
                                 >
                                     Email
                                 </a>
@@ -165,7 +165,7 @@
                     <div class="space-y-6">
                         <div class="flex justify-between items-center">
                             <h3 class="text-lg font-semibold text-gray-900">Conversations</h3>
-                            <button @click="showAddConversation = !showAddConversation" class="btn-primary">
+                            <button @click="showAddConversation = !showAddConversation" class="btn btn-primary">
                                 Add Note
                             </button>
                         </div>
@@ -179,8 +179,8 @@
                                 placeholder="Add a note about this lead..."
                             ></textarea>
                             <div class="flex space-x-2">
-                                <button @click="addConversation" class="btn-primary">Add Note</button>
-                                <button @click="showAddConversation = false" class="btn-secondary">Cancel</button>
+                                <button @click="addConversation" class="btn btn-primary">Add Note</button>
+                                <button @click="showAddConversation = false" class="btn btn-secondary">Cancel</button>
                             </div>
                         </div>
 
@@ -221,6 +221,21 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'updated'])
 
+// Auth config helper: token (SPA) or session (cookies)
+const getAuthConfig = () => {
+    const token = localStorage.getItem('token')
+    if (token) {
+        return { headers: { 'Authorization': 'Bearer ' + token } }
+    }
+    return { withCredentials: true }
+}
+
+// Base paths: API for token users, web for session users
+const hasToken = !!localStorage.getItem('token')
+const apiLeadsPath = '/api/v1/leads'
+const webLeadsPath = '/org/leads'
+const activeLeadsBasePath = ref(hasToken ? apiLeadsPath : webLeadsPath)
+
 const notes = ref('')
 const conversations = ref([])
 const showAddConversation = ref(false)
@@ -235,113 +250,80 @@ watch(() => props.lead, (newLead) => {
 
 const loadConversations = async () => {
     if (!props.lead?.id) return
-
     try {
-        const response = await axios.get(`/api/v1/org/leads/${props.lead.id}`, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
-        })
-
+        const base = hasToken ? apiLeadsPath : webLeadsPath
+        const response = await axios.get(`${base}/${props.lead.id}`, getAuthConfig())
         if (response.data.success) {
             conversations.value = response.data.data.conversations || []
         }
     } catch (error) {
-        console.error('Error loading conversations:', error)
+        // ignore in UI
     }
 }
 
 const updateNotes = async () => {
     if (!props.lead?.id) return
-
     try {
-        const response = await axios.put(`/api/v1/org/leads/${props.lead.id}`, {
-            notes: notes.value
-        }, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
-        })
-
+        const base = hasToken ? apiLeadsPath : webLeadsPath
+        const response = await axios.put(`${base}/${props.lead.id}`, { notes: notes.value }, getAuthConfig())
         if (response.data.success) {
             props.lead.notes = notes.value
         }
     } catch (error) {
-        console.error('Error updating notes:', error)
+        // ignore in UI
     }
 }
 
 const addConversation = async () => {
     if (!newConversation.value.trim() || !props.lead?.id) return
-
     try {
-        const response = await axios.post(`/api/v1/org/leads/${props.lead.id}/conversations`, {
-            message: newConversation.value
-        }, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
-        })
-
+        const base = hasToken ? apiLeadsPath : webLeadsPath
+        const response = await axios.post(`${base}/${props.lead.id}/conversations`, { message: newConversation.value }, getAuthConfig())
         if (response.data.success) {
             conversations.value.push(response.data.data)
             newConversation.value = ''
             showAddConversation.value = false
         }
     } catch (error) {
-        console.error('Error adding conversation:', error)
+        // ignore in UI
     }
 }
 
 const markContacted = async () => {
     try {
-        const response = await axios.post(`/api/v1/org/leads/${props.lead.id}/mark-contacted`, {}, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
-        })
-
+        const response = await axios.post(`${activeLeadsBasePath.value}/${props.lead.id}/mark-contacted`, {}, getAuthConfig())
         if (response.data.success) {
             props.lead.status = 'contacted'
             props.lead.contacted_at = new Date().toISOString()
             emit('updated')
         }
     } catch (error) {
-        console.error('Error marking lead as contacted:', error)
+        // ignore in UI
     }
 }
 
 const markConverted = async () => {
     try {
-        const response = await axios.post(`/api/v1/org/leads/${props.lead.id}/mark-converted`, {}, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
-        })
-
+        const response = await axios.post(`${activeLeadsBasePath.value}/${props.lead.id}/mark-converted`, {}, getAuthConfig())
         if (response.data.success) {
             props.lead.status = 'converted'
             emit('updated')
         }
     } catch (error) {
-        console.error('Error marking lead as converted:', error)
+        // ignore in UI
     }
 }
 
 const markNotInterested = async () => {
     try {
-        const response = await axios.post(`/api/v1/org/leads/${props.lead.id}/mark-not-interested`, {}, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
-        })
-
+        const base = hasToken ? apiLeadsPath : webLeadsPath
+        const response = await axios.post(`${base}/${props.lead.id}/mark-not-interested`, {}, getAuthConfig())
         if (response.data.success) {
             props.lead.status = 'not_interested'
             emit('updated')
         }
     } catch (error) {
-        console.error('Error marking lead as not interested:', error)
+        // ignore in UI
     }
 }
 
