@@ -86,7 +86,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
 
 const props = defineProps({
     property: Object,
@@ -108,27 +107,27 @@ const error = ref(null)
 const submitLead = async () => {
     loading.value = true
     error.value = null
-
     try {
-        const response = await axios.post('/api/v1/leads', {
-            property_id: props.property.id,
-            name: form.value.name,
-            phone: form.value.phone,
-            email: form.value.email,
-            message: form.value.message,
-            source: 'public_listing'
+        const response = await fetch(`/marketplace/properties/${props.property.id}/contact`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify(form.value)
         })
-
-        if (response.data.success) {
-            emit('success', response.data.data)
-            closeModal()
-        } else {
-            error.value = response.data.message || 'Failed to send inquiry'
+        const data = await response.json()
+        if (!response.ok) {
+            error.value = data.message || 'Failed to send inquiry'
             emit('error', error.value)
+            return
         }
+        emit('success', data)
+        closeModal()
     } catch (err) {
         console.error('Error submitting lead:', err)
-        error.value = err.response?.data?.message || 'An unexpected error occurred'
+        error.value = 'An unexpected error occurred'
         emit('error', error.value)
     } finally {
         loading.value = false

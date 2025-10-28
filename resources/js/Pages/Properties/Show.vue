@@ -147,9 +147,16 @@
                                     <span class="text-gray-600">contact@salemitra.com</span>
                                 </div>
                             </div>
-                            <button class="btn btn-primary w-full mt-4">
+                            <button class="btn btn-primary w-full mt-4" @click="showContactModal = true">
                                 Contact Owner
                             </button>
+                            <ContactOwnerModal
+                                :show="showContactModal"
+                                :property-id="props.property.id"
+                                :user="user"
+                                @close="showContactModal = false"
+                                @submitted="onContactSubmitted"
+                            />
                         </div>
 
                         <!-- Property Status -->
@@ -201,9 +208,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Header from '../../Components/Header.vue'
 import ImagePlaceholder from '../../Components/ImagePlaceholder.vue'
+
+import ContactOwnerModal from '../../Components/ContactOwnerModal.vue'
+
+const user = computed(() => {
+    return (window && window.SalemitraUser) ? window.SalemitraUser : null
+})
+
+const showContactModal = ref(false)
+
+function onContactSubmitted() {
+    // Optionally show a toast or reload inquiries
+}
 
 const props = defineProps({
     property: {

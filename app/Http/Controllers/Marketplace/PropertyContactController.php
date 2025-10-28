@@ -172,6 +172,9 @@ class PropertyContactController extends Controller
                     $lead->phone = $request->phone;
                     $lead->message = $request->message;
                     $lead->status = 'new';
+                    if ($request->user()) {
+                        $lead->user_id = $request->user()->id;
+                    }
 
                     // Add additional fields only if they exist in the table
                     if (in_array('source', $columns)) {
