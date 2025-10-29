@@ -159,7 +159,7 @@
                     </div>
 
                     <!-- Empty State -->
-                    <div v-if="tenants.length === 0" class="text-center py-12">
+                    <div v-if="props.tenants.length === 0" class="text-center py-12">
                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
@@ -220,6 +220,10 @@ const props = defineProps({
             expiring: 0,
             overdue: 0
         })
+    },
+    appliedFilters: {
+        type: Object,
+        default: () => ({ search: '', property_id: '', status: '', lease_status: '' })
     }
 })
 
@@ -227,10 +231,10 @@ const loading = ref(false)
 const showAddModal = ref(false)
 
 const filters = ref({
-    search: '',
-    property_id: '',
-    status: '',
-    lease_status: ''
+    search: props.appliedFilters.search || '',
+    property_id: props.appliedFilters.property_id || '',
+    status: props.appliedFilters.status || '',
+    lease_status: props.appliedFilters.lease_status || ''
 })
 
 const formatPrice = (price) => {
@@ -278,19 +282,17 @@ const getDaysUntilExpiry = (endDate) => {
 // Data is now provided via props from the backend controller
 
 const applyFilters = () => {
-    // Filters will be handled by the backend controller
-    // For now, we'll just reload the page to apply filters
-    window.location.reload()
+    const params = new URLSearchParams()
+    if (filters.value.search) params.set('search', filters.value.search)
+    if (filters.value.property_id) params.set('property_id', filters.value.property_id)
+    if (filters.value.status) params.set('status', filters.value.status)
+    if (filters.value.lease_status) params.set('lease_status', filters.value.lease_status)
+    const qs = params.toString()
+    window.location.href = qs ? `/tenants?${qs}` : '/tenants'
 }
 
 const clearFilters = () => {
-    filters.value = {
-        search: '',
-        property_id: '',
-        status: '',
-        lease_status: ''
-    }
-    loadTenants()
+    window.location.href = '/tenants'
 }
 
 const viewTenant = (tenant) => {
@@ -308,17 +310,20 @@ const viewPayments = (tenant) => {
 const deleteTenant = async (tenant) => {
     if (confirm('Are you sure you want to delete this tenant?')) {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/v1/org/tenants/${tenant.id}`, {
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            const response = await fetch(`/tenants/${tenant.id}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                    'Content-Type': 'application/json'
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
                 }
             })
             
             if (response.ok) {
-                tenants.value = tenants.value.filter(t => t.id !== tenant.id)
-                calculateStats()
+                window.location.reload()
+            } else {
+                console.error('Failed to delete tenant')
             }
         } catch (error) {
             console.error('Error deleting tenant:', error)

@@ -163,12 +163,24 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 
 const props = defineProps({
     properties: {
         type: Array,
         default: () => []
+    },
+    initialTenant: {
+        type: Object,
+        default: null
+    },
+    "initial-tenant": { // for kebab-case prop for Vue <script setup> compatibility
+        type: Object,
+        default: null
+    },
+    mode: {
+        type: String,
+        default: 'create',
     }
 })
 
@@ -189,15 +201,68 @@ const form = ref({
     emergency_contact_phone: '',
     occupation: '',
     company: '',
-    notes: ''
+    notes: '',
+    status: 'active',
 })
+
+// Helper: fills form fields from initialTenant if present
+function fillFormFromInitial() {
+    const source = props.initialTenant || props["initial-tenant"]
+    if (source) {
+        const toDateInput = (val) => {
+            if (!val) return ''
+            if (val instanceof Date && !isNaN(val)) {
+                const y = val.getFullYear()
+                const m = String(val.getMonth() + 1).padStart(2, '0')
+                const d = String(val.getDate()).padStart(2, '0')
+                return `${y}-${m}-${d}`
+            }
+            if (typeof val === 'string') {
+                // Accept 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS' or ISO strings
+                if (val.length >= 10) return val.substring(0, 10)
+            }
+            const parsed = new Date(val)
+            if (!isNaN(parsed)) {
+                const y = parsed.getFullYear()
+                const m = String(parsed.getMonth() + 1).padStart(2, '0')
+                const d = String(parsed.getDate()).padStart(2, '0')
+                return `${y}-${m}-${d}`
+            }
+            return ''
+        }
+        form.value = {
+            name: source.name || '',
+            email: source.email || '',
+            phone: source.phone || '',
+            property_id: source.property_id ? String(source.property_id) : '',
+            lease_start_date: toDateInput(typeof source.lease_start_date !== 'undefined' ? source.lease_start_date : source.lease_start),
+            lease_end_date: toDateInput(typeof source.lease_end_date !== 'undefined' ? source.lease_end_date : source.lease_end),
+            monthly_rent: source.monthly_rent || source.rent_amount || '',
+            security_deposit: source.security_deposit || '',
+            emergency_contact_name: source.emergency_contact_name || '',
+            emergency_contact_phone: source.emergency_contact_phone || '',
+            occupation: source.occupation || '',
+            company: source.company || '',
+            notes: source.notes || '',
+            status: source.status || 'active',
+        }
+    }
+}
+// Run on mount and watch prop
+onMounted(fillFormFromInitial)
+watch(() => props.initialTenant, fillFormFromInitial)
+watch(() => props["initial-tenant"], fillFormFromInitial)
 
 const saveTenant = async () => {
     loading.value = true
     
     try {
-        const response = await fetch('/tenants', {
-            method: 'POST',
+        const source = props.initialTenant || props["initial-tenant"]
+        const isEdit = props.mode === 'edit' && source && source.id
+        const url = isEdit ? `/tenants/${source.id}` : '/tenants'
+        const method = isEdit ? 'PUT' : 'POST'
+        const response = await fetch(url, {
+            method,
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),

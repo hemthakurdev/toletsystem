@@ -16,11 +16,41 @@ class TenantsController extends Controller
         $user = Auth::user();
         $organization = $user->organization;
 
+        // Base query
+        $query = $organization->tenants()->with(['property']);
+
+        // Apply filters from query string
+        if ($request->filled('search')) {
+            $search = $request->string('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('property_id')) {
+            $query->where('property_id', $request->integer('property_id'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->string('status'));
+        }
+
+        if ($request->filled('lease_status')) {
+            $leaseStatus = $request->string('lease_status');
+            // Interpret lease status from dates and status
+            if ($leaseStatus === 'active') {
+                $query->where('status', 'active')->whereDate('lease_end', '>=', now()->toDateString());
+            } elseif ($leaseStatus === 'expired') {
+                $query->whereDate('lease_end', '<', now()->toDateString());
+            } elseif ($leaseStatus === 'terminated') {
+                $query->where('status', 'terminated');
+            }
+        }
+
         // Get tenants for the organization
-        $tenants = $organization->tenants()
-            ->with(['property'])
-            ->latest()
-            ->get()
+        $tenants = $query->latest()->get()
             ->map(function ($tenant) {
                 return [
                     'id' => $tenant->id,
@@ -30,8 +60,16 @@ class TenantsController extends Controller
                     'occupation' => $tenant->occupation,
                     'company' => $tenant->company,
                     'property_id' => $tenant->property_id,
+                    // Provide nested property object for frontend expectations
+                    'property' => $tenant->property ? [
+                        'id' => $tenant->property->id,
+                        'title' => $tenant->property->title,
+                        'locality' => $tenant->property->locality,
+                        'city' => $tenant->property->city,
+                    ] : null,
+                    // Keep property_title for any legacy usage
                     'property_title' => $tenant->property ? $tenant->property->title : null,
-                    'monthly_rent' => $tenant->monthly_rent,
+                    'monthly_rent' => $tenant->rent_amount,
                     'security_deposit' => $tenant->security_deposit,
                     'lease_start_date' => $tenant->lease_start,
                     'lease_end_date' => $tenant->lease_end,
@@ -44,8 +82,9 @@ class TenantsController extends Controller
                 ];
             });
 
-        // Get properties for the organization (for the dropdown)
+        // Get vacant properties for the dropdown in Add Tenant modal
         $properties = $organization->properties()
+            ->where('availability_status', 'vacant')
             ->select('id', 'title', 'city', 'locality')
             ->get();
 
@@ -65,6 +104,12 @@ class TenantsController extends Controller
             'tenants' => $tenants,
             'properties' => $properties,
             'stats' => $stats,
+            'appliedFilters' => [
+                'search' => (string) $request->query('search', ''),
+                'property_id' => $request->query('property_id', ''),
+                'status' => (string) $request->query('status', ''),
+                'lease_status' => (string) $request->query('lease_status', ''),
+            ],
         ]);
     }
 
@@ -75,6 +120,7 @@ class TenantsController extends Controller
 
         // Get properties for the dropdown
         $properties = $organization->properties()
+            ->where('availability_status', 'vacant')
             ->select('id', 'title', 'city', 'locality')
             ->get();
 
@@ -106,6 +152,10 @@ class TenantsController extends Controller
 
         // Get properties for the dropdown
         $properties = $organization->properties()
+            ->where(function ($q) use ($tenant) {
+                $q->where('availability_status', 'vacant')
+                  ->orWhere('id', $tenant->property_id);
+            })
             ->select('id', 'title', 'city', 'locality')
             ->get();
 
@@ -149,6 +199,12 @@ class TenantsController extends Controller
 
         $tenant = Tenant::create($validated);
 
+        // Mark property as occupied
+        $property = Property::find($tenant->property_id);
+        if ($property) {
+            $property->markAsOccupied();
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Tenant created successfully',
@@ -162,6 +218,7 @@ class TenantsController extends Controller
         $organization = $user->organization;
 
         $tenant = $organization->tenants()->findOrFail($id);
+        $oldPropertyId = $tenant->property_id;
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -190,6 +247,28 @@ class TenantsController extends Controller
 
         $tenant->update($validated);
 
+        // If property changed, make old vacant and new occupied
+        if (isset($validated['property_id']) && (int)$validated['property_id'] !== (int)$oldPropertyId) {
+            if ($oldPropertyId) {
+                $old = Property::find($oldPropertyId);
+                if ($old) {
+                    $old->markAsVacant();
+                }
+            }
+            $new = Property::find($tenant->property_id);
+            if ($new) {
+                $new->markAsOccupied();
+            }
+        }
+
+        // If status is terminated, mark property as vacant
+        if (($validated['status'] ?? $tenant->status) === 'terminated') {
+            $property = Property::find($tenant->property_id);
+            if ($property) {
+                $property->markAsVacant();
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Tenant updated successfully',
@@ -203,7 +282,13 @@ class TenantsController extends Controller
         $organization = $user->organization;
 
         $tenant = $organization->tenants()->findOrFail($id);
+        $property = Property::find($tenant->property_id);
         $tenant->delete();
+
+        // Mark property as vacant when tenant is deleted
+        if ($property) {
+            $property->markAsVacant();
+        }
 
         return response()->json([
             'success' => true,

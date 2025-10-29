@@ -21,8 +21,10 @@ class PropertyController extends Controller
             $query = Property::with(['organization', 'amenities', 'tenants'])
                 ->where('org_id', auth()->user()->org_id);
         } else {
-            // Public marketplace properties
-            $query = Property::published()->with(['organization', 'amenities']);
+            // Public marketplace properties (exclude leased by default)
+            $query = Property::published()
+                ->where('availability_status', 'vacant')
+                ->with(['organization', 'amenities']);
         }
 
         // Apply filters
@@ -171,6 +173,8 @@ class PropertyController extends Controller
             ], 404);
         }
 
+        // Note: Allow occupied properties to be viewed; frontend will show 'Occupied' and hide contact
+
         $property->load(['organization', 'amenities']);
 
         return response()->json([
@@ -291,6 +295,14 @@ class PropertyController extends Controller
      */
     public function contact(Request $request, Property $property): JsonResponse
     {
+        // Prevent contacting owner for occupied properties
+        if ($property->availability_status !== 'vacant') {
+            return response()->json([
+                'success' => false,
+                'message' => 'This property is already leased and not available for inquiries.',
+            ], 400);
+        }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',

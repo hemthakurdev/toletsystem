@@ -72,6 +72,11 @@
                                         Featured
                                     </span>
                                 </div>
+                                <div v-if="property.availability_status && property.availability_status !== 'vacant'" class="absolute top-4 right-4">
+                                    <span class="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                        Already Leased
+                                    </span>
+                                </div>
                             </div>
                             <div v-else class="w-full h-96 bg-gray-200 flex items-center justify-center">
                                 <div class="text-center text-gray-500">
@@ -111,6 +116,12 @@
                                         <div class="flex justify-between">
                                             <span class="text-gray-600">Furnished:</span>
                                             <span class="font-medium">{{ property.furnished_status?.replace('_', ' ') }}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Availability:</span>
+                                            <span class="font-medium" :class="property.availability_status === 'vacant' ? 'text-green-700' : 'text-red-600'">
+                                                {{ property.availability_status === 'vacant' ? 'Available' : 'Already Leased' }}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -168,7 +179,13 @@
                             </div>
 
                             <div class="space-y-4">
+                                <div v-if="property.availability_status && property.availability_status !== 'vacant'" class="w-full">
+                                    <div class="bg-red-50 text-red-700 border border-red-200 px-4 py-3 rounded-md text-center font-medium">
+                                        Already Leased
+                                    </div>
+                                </div>
                                 <button 
+                                    v-else
                                     @click="showLeadForm = true" 
                                     class="btn btn-primary w-full"
                                 >

@@ -100,6 +100,13 @@
                                 {{ property.property_type }}
                             </span>
                         </div>
+
+                        <!-- Occupied Badge -->
+                        <div v-if="property.availability_status && property.availability_status !== 'vacant'" class="absolute bottom-3 left-3">
+                            <span class="px-2 py-1 bg-red-600 text-white text-xs font-medium rounded-full">
+                                Occupied
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Property Details -->
@@ -157,12 +164,17 @@
                                 >
                                     View Details
                                 </button>
-                                <button
-                                    @click="contactOwner(property)"
-                                    class="btn btn-primary btn-sm"
-                                >
-                                    Contact
-                                </button>
+                                <template v-if="!property.availability_status || property.availability_status === 'vacant'">
+                                    <button
+                                        @click="contactOwner(property)"
+                                        class="btn btn-primary btn-sm"
+                                    >
+                                        Contact
+                                    </button>
+                                </template>
+                                <template v-else>
+                                    <span class="text-xs font-medium text-red-600">Already Leased</span>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -269,12 +281,12 @@ const toggleFavorite = async (propertyId) => {
 }
 
 const viewProperty = (propertyId) => {
-    router.visit(`/properties/${propertyId}`)
+    router.visit(`/marketplace/properties/${propertyId}`)
 }
 
 const contactOwner = (property) => {
     // Navigate to contact form or open modal
-    router.visit(`/properties/${property.id}/contact`)
+    router.visit(`/marketplace/properties/${property.id}/contact`)
 }
 
 onMounted(() => {
