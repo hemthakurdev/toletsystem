@@ -114,6 +114,9 @@ Route::prefix('org')->middleware(['auth'])->group(function () {
     Route::post('leads/{lead}/mark-converted', [\App\Http\Controllers\Api\LeadController::class, 'markConverted']);
     Route::post('leads/{lead}/mark-not-interested', [\App\Http\Controllers\Api\LeadController::class, 'markNotInterested']);
     Route::delete('leads/{lead}', [\App\Http\Controllers\Api\LeadController::class, 'destroy']);
+
+        // Web JSON endpoints for invoices (session-auth alternative to API)
+        Route::post('invoices', [\App\Http\Controllers\Api\InvoiceController::class, 'store']);
 });
 
 Route::get('/leads/create', function () {
@@ -239,6 +242,47 @@ Route::prefix('user')->group(function () {
             return Inertia::render('User/Favorites');
         })->name('user.favorites');
         Route::get('inquiries', [App\Http\Controllers\UserInquiryController::class, 'index'])->name('user.inquiries');
+        // Session-auth JSON for org data needed by owner UI without tokens
+        Route::prefix('org')->group(function () {
+            Route::get('tenants', function (Request $request) {
+                $org = $request->user()->organization;
+                $tenants = $org->tenants()
+                    ->with(['property'])
+                    ->orderByDesc('created_at')
+                    ->get();
+                return response()->json(['success' => true, 'data' => $tenants]);
+            });
+            Route::get('properties', function (Request $request) {
+                $org = $request->user()->organization;
+                $properties = $org->properties()
+                    ->select('id', 'title', 'city', 'locality')
+                    ->orderByDesc('created_at')
+                    ->get();
+                return response()->json(['success' => true, 'data' => $properties]);
+            });
+        });
+        // Tenant self-service pages
+        Route::get('invoices', function () {
+            return Inertia::render('User/Tenancy');
+        })->name('user.tenancy');
+        // Frontend user's invoices API (session-authenticated)
+        Route::get('api/v1/user/invoices', function (Request $request) {
+            $user = $request->user();
+            // Find tenants linked to this frontend user via lead_user_id
+            $tenantIds = \App\Models\Tenant::where('lead_user_id', $user->id)->pluck('id');
+            $query = \App\Models\Invoice::with(['property'])
+                ->whereIn('tenant_id', $tenantIds)
+                ->orderByDesc('created_at');
+            if ($request->filled('property_id')) {
+                $query->where('property_id', $request->integer('property_id'));
+            }
+            if ($request->filled('status')) {
+                $query->where('status', $request->string('status'));
+            }
+            $perPage = (int) $request->get('per_page', 10);
+            $invoices = $query->paginate($perPage);
+            return response()->json(['success' => true, 'data' => $invoices]);
+        })->name('user.api.invoices');
         
         // Favorites API Routes (for session-based authentication)
         Route::prefix('api/v1/user/favorites')->middleware(['auth:sanctum,web'])->group(function () {

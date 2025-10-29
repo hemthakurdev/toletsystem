@@ -41,8 +41,11 @@
                   <button class="btn btn-primary btn-sm" @click="openConversations(lead)">
                     {{ expandedLeadId === lead.id ? 'Hide Conversations' : 'Conversations' }}
                   </button>
-                  <button class="btn btn-danger btn-sm" :disabled="deletingId === lead.id" @click="cancelInquiry(lead)">
+                  <button v-if="lead.status !== 'converted'" class="btn btn-danger btn-sm" :disabled="deletingId === lead.id" @click="cancelInquiry(lead)">
                     {{ deletingId === lead.id ? 'Cancelling...' : 'Cancel' }}
+                  </button>
+                  <button v-else class="btn btn-secondary btn-sm" @click="manageInvoices(lead)">
+                    Manage Rent & Invoices
                   </button>
                 </div>
               </div>
@@ -120,8 +123,11 @@
                   <button class="btn btn-primary btn-sm" @click="openConversations(lead)">
                     {{ expandedLeadId === lead.id ? 'Hide Conversations' : 'Conversations' }}
                   </button>
-                  <button class="btn btn-danger btn-sm" :disabled="deletingId === lead.id" @click="cancelInquiry(lead)">
+                  <button v-if="lead.status !== 'converted'" class="btn btn-danger btn-sm" :disabled="deletingId === lead.id" @click="cancelInquiry(lead)">
                     {{ deletingId === lead.id ? 'Cancelling...' : 'Cancel Inquiry' }}
+                  </button>
+                  <button v-else class="btn btn-secondary btn-sm" @click="manageInvoices(lead)">
+                    Manage Rent & Invoices
                   </button>
                 </div>
               </td>
@@ -277,6 +283,11 @@ const cancelInquiry = async (lead) => {
   } finally {
     deletingId.value = null
   }
+}
+
+const manageInvoices = (lead) => {
+  const url = lead.property?.id ? `/user/invoices?property_id=${lead.property.id}` : '/user/invoices'
+  window.location.href = url
 }
 
 const prettySender = (type) => {

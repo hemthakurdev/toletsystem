@@ -162,7 +162,7 @@
                                         <div class="flex space-x-2">
                                             <button @click="viewLead(lead)" class="text-sky-800 hover:text-sky-900">View</button>
                                             <button v-if="lead.status === 'new'" @click="markContacted(lead)" class="text-green-600 hover:text-green-900">Contact</button>
-                                            <button v-if="lead.status === 'contacted'" @click="markConverted(lead)" class="text-purple-600 hover:text-purple-900">Convert</button>
+                                            <button v-if="lead.status === 'contacted'" @click="openConvertModal(lead)" class="text-purple-600 hover:text-purple-900">Convert to Tenant</button>
                                             <button @click="deleteLead(lead)" class="text-red-600 hover:text-red-900">Delete</button>
                                         </div>
                                     </td>
@@ -206,6 +206,29 @@
             @close="closeLeadModal"
             @updated="onLeadUpdated"
         />
+
+        <!-- Convert Lead to Tenant Modal -->
+        <div v-if="showConvert" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+                <div class="mt-3">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Convert Lead to Tenant</h3>
+                        <button @click="closeConvert" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <TenantForm 
+                        v-if="convertInitial && propertiesForConvert"
+                        :initial-tenant="convertInitial"
+                        :properties="propertiesForConvert"
+                        @saved="onConverted"
+                        @cancelled="closeConvert"
+                    />
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -213,6 +236,7 @@
 import { ref, onMounted } from 'vue'
 import Header from '../../Components/Header.vue'
 import axios from 'axios'
+import TenantForm from '../Tenants/TenantForm.vue'
 
 // Helper to build axios config supporting either token-based auth (SPA) or cookie-based session (Laravel Sanctum)
 const getAuthConfig = () => {
@@ -245,6 +269,9 @@ const showRawResponse = ref(false)
 const showLeadModal = ref(false)
 const selectedLead = ref(null)
 const pagination = ref(null)
+const showConvert = ref(false)
+const convertInitial = ref(null)
+const propertiesForConvert = ref(null)
 
 const filters = ref({
     search: '',
@@ -425,6 +452,61 @@ const markConverted = async (lead) => {
         // Swallow noisy console in production UI
         alert('Failed to update lead status')
     }
+}
+
+const openConvertModal = async (lead) => {
+    selectedLead.value = lead
+    // Build initial tenant data from lead
+    convertInitial.value = {
+        name: lead.name,
+        email: lead.email || '',
+        phone: lead.phone,
+        property_id: lead.property?.id ? String(lead.property.id) : '',
+        monthly_rent: lead.property?.price || '',
+        lease_start_date: '',
+        lease_end_date: '',
+        security_deposit: lead.property?.security_deposit || '',
+        notes: lead.message || '',
+        lead_id: lead.id,
+        lead_user_id: lead.user_id || null,
+        status: 'active'
+    }
+    // Load vacant properties for selection (public search API)
+    try {
+        const propsResp = await axios.get('/api/v1/search/properties', { params: { per_page: 100, sort_by: 'newest' } })
+        if (propsResp.data?.success) {
+            const payload = propsResp.data.data
+            propertiesForConvert.value = Array.isArray(payload.data) ? payload.data : (Array.isArray(payload) ? payload : [])
+        } else {
+            propertiesForConvert.value = []
+        }
+        // Ensure the lead's property is available in the dropdown (even if not vacant)
+        if (lead.property?.id) {
+            const exists = (propertiesForConvert.value || []).some(p => String(p.id) === String(lead.property.id))
+            if (!exists) {
+                try {
+                    const oneResp = await axios.get(`/api/v1/properties/${lead.property.id}`)
+                    if (oneResp.data?.success && oneResp.data.data) {
+                        propertiesForConvert.value = [...(propertiesForConvert.value || []), oneResp.data.data]
+                    }
+                } catch (_) {}
+            }
+        }
+    } catch (e) {
+        propertiesForConvert.value = []
+    }
+    showConvert.value = true
+}
+
+const closeConvert = () => {
+    showConvert.value = false
+    convertInitial.value = null
+    propertiesForConvert.value = null
+}
+
+const onConverted = () => {
+    showConvert.value = false
+    loadLeads()
 }
 
 const deleteLead = async (lead) => {

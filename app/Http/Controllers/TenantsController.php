@@ -184,6 +184,8 @@ class TenantsController extends Controller
             'emergency_contact_name' => 'nullable|string|max:255',
             'emergency_contact_phone' => 'nullable|string|max:20',
             'notes' => 'nullable|string',
+            'lead_id' => 'nullable|exists:leads,id',
+            'lead_user_id' => 'nullable|exists:users,id',
         ]);
 
         $validated['org_id'] = $organization->id;
@@ -198,6 +200,15 @@ class TenantsController extends Controller
         unset($validated['lease_start_date'], $validated['lease_end_date'], $validated['monthly_rent']);
 
         $tenant = Tenant::create($validated);
+
+        // If linked to a lead, mark lead converted (best-effort)
+        if (!empty($validated['lead_id'])) {
+            try {
+                \App\Models\Lead::where('id', $validated['lead_id'])
+                    ->where('org_id', $organization->id)
+                    ->update(['status' => 'converted']);
+            } catch (\Throwable $e) {}
+        }
 
         // Mark property as occupied
         $property = Property::find($tenant->property_id);

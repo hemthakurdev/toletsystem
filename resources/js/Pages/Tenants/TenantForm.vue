@@ -63,7 +63,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Property *</label>
                     <select v-model="form.property_id" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-sky-800 focus:border-sky-500">
                         <option value="">Select Property</option>
-                        <option v-for="property in properties" :key="property.id" :value="property.id">
+                        <option v-for="property in properties" :key="property.id" :value="String(property.id)">
                             {{ property.title }} - {{ property.locality }}, {{ property.city }}
                         </option>
                     </select>
@@ -203,6 +203,8 @@ const form = ref({
     company: '',
     notes: '',
     status: 'active',
+    lead_id: null,
+    lead_user_id: null,
 })
 
 // Helper: fills form fields from initialTenant if present
@@ -245,6 +247,8 @@ function fillFormFromInitial() {
             company: source.company || '',
             notes: source.notes || '',
             status: source.status || 'active',
+            lead_id: source.lead_id ?? null,
+            lead_user_id: source.lead_user_id ?? null,
         }
     }
 }

@@ -9,7 +9,7 @@
                     <select v-model="form.tenant_id" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-sky-800 focus:border-sky-500">
                         <option value="">Select Tenant</option>
                         <option v-for="tenant in tenants" :key="tenant.id" :value="tenant.id">
-                            {{ tenant.name }} - {{ tenant.property?.title }}
+                            {{ tenant.name }} - {{ tenant.property?.title || tenant.property_title || ('#'+tenant.property_id) }}
                         </option>
                     </select>
                 </div>
@@ -208,6 +208,28 @@ watch(() => form.value.tenant_id, (newTenantId) => {
     }
 })
 
+// Watch for property selection to auto-select tenant if unique
+watch(() => form.value.property_id, (newPropertyId) => {
+    if (!newPropertyId) return
+    const candidates = props.tenants.filter(t => t.property_id == newPropertyId)
+    if (candidates.length === 1) {
+        form.value.tenant_id = candidates[0].id
+        if (form.value.type === 'rent' || !form.value.type) {
+            form.value.amount = candidates[0].rent_amount || form.value.amount
+        }
+    }
+})
+
+// Watch for type to prefill amount for rent
+watch(() => form.value.type, (newType) => {
+    if (newType === 'rent' && form.value.tenant_id) {
+        const t = props.tenants.find(tenant => tenant.id == form.value.tenant_id)
+        if (t && t.rent_amount) {
+            form.value.amount = t.rent_amount
+        }
+    }
+})
+
 const addItem = () => {
     form.value.items.push({
         description: '',
@@ -228,27 +250,53 @@ const calculateItemAmount = (index) => {
 
 const saveInvoice = async () => {
     loading.value = true
-    
     try {
-        const response = await fetch('/api/v1/org/invoices', {
+        // Build payload safely
+        const payload = {
+            tenant_id: form.value.tenant_id || '',
+            property_id: form.value.property_id || '',
+            type: form.value.type || 'rent',
+            amount: form.value.amount || 0,
+            due_date: form.value.due_date || '',
+            description: form.value.description || '',
+            items: (form.value.items || [])
+                .filter(it => (it && typeof it.description === 'string' && it.description.trim() !== ''))
+                .map(it => ({
+                    description: String(it.description || ''),
+                    quantity: Number(it.quantity || 0),
+                    rate: Number(it.rate || 0),
+                    amount: Number(it.amount || 0)
+                })),
+            notes: form.value.notes || ''
+        }
+
+        const token = localStorage.getItem('token')
+        const init = {
             method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            headers: token ? {
+                'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                ...form.value,
-                items: form.value.items.filter(item => item.description.trim() !== '')
-            })
-        })
-        
-        const data = await response.json()
-        
-        if (data.success) {
+            } : { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+            body: JSON.stringify(payload),
+            credentials: token ? undefined : 'include'
+        }
+
+        // Prefer API when token available; else use web JSON endpoint with session
+        const url = token ? '/api/v1/org/invoices' : '/org/invoices'
+        const res = await fetch(url, init)
+        const ct = res.headers.get('content-type') || ''
+        let data = null
+        if (ct.includes('application/json')) {
+            try { data = await res.json() } catch (_) { data = null }
+        }
+
+        // Consider 200 OK without JSON or without explicit success flag as success
+        if (res.ok && (!data || data?.success === true || typeof data?.success === 'undefined')) {
             emit('saved')
         } else {
-            console.error('Error saving invoice:', data.message)
-            alert('Error saving invoice: ' + (data.message || 'Unknown error'))
+            const message = data?.message || `Request failed (${res.status})`
+            console.error('Error saving invoice:', message)
+            alert('Error saving invoice: ' + message)
         }
     } catch (error) {
         console.error('Error saving invoice:', error)

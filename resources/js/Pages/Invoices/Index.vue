@@ -328,13 +328,33 @@ const getTotalPaid = (payments) => {
     return payments.reduce((total, payment) => total + parseFloat(payment.amount), 0)
 }
 
+// Safe fetch JSON helper
+const fetchJson = async (url, init = {}) => {
+    const res = await fetch(url, init)
+    const ct = res.headers.get('content-type') || ''
+    let data = null
+    if (ct.includes('application/json')) {
+        try {
+            data = await res.json()
+        } catch (_) {
+            data = null
+        }
+    }
+    return { res, data }
+}
+
 const loadInvoices = async () => {
     loading.value = true
     try {
-        const response = await fetch('http://127.0.0.1:8000/api/v1/org/invoices?' + new URLSearchParams(filters.value))
-        const data = await response.json()
-        if (data.success) {
-            invoices.value = data.data.data
+        const token = localStorage.getItem('token')
+        const params = new URLSearchParams()
+        Object.entries(filters.value).forEach(([k, v]) => { if (v) params.append(k, v) })
+        const { data } = await fetchJson('/api/v1/org/invoices' + (params.toString() ? ('?' + params.toString()) : ''), token ? {
+            headers: { 'Authorization': 'Bearer ' + token }
+        } : { credentials: 'include' })
+        if (data?.success) {
+            const payload = data.data
+            invoices.value = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : [])
         }
     } catch (error) {
         console.error('Error loading invoices:', error)
@@ -345,9 +365,11 @@ const loadInvoices = async () => {
 
 const loadStatistics = async () => {
     try {
-        const response = await fetch('http://127.0.0.1:8000/api/v1/org/invoices/statistics')
-        const data = await response.json()
-        if (data.success) {
+        const token = localStorage.getItem('token')
+        const { data } = await fetchJson('/api/v1/org/invoices/statistics', token ? {
+            headers: { 'Authorization': 'Bearer ' + token }
+        } : { credentials: 'include' })
+        if (data?.success) {
             stats.value = data.data
         }
     } catch (error) {
@@ -357,10 +379,17 @@ const loadStatistics = async () => {
 
 const loadTenants = async () => {
     try {
-        const response = await fetch('http://127.0.0.1:8000/api/v1/org/tenants')
-        const data = await response.json()
-        if (data.success) {
-            tenants.value = data.data.data
+        const token = localStorage.getItem('token')
+        let { data } = await fetchJson('/api/v1/org/tenants', token ? {
+            headers: { 'Authorization': 'Bearer ' + token }
+        } : { credentials: 'include' })
+        if (!data?.success) {
+            const fb = await fetchJson('/user/org/tenants', { credentials: 'include' })
+            data = fb.data
+        }
+        if (data?.success) {
+            const payload = data.data
+            tenants.value = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : [])
         }
     } catch (error) {
         console.error('Error loading tenants:', error)
@@ -369,10 +398,17 @@ const loadTenants = async () => {
 
 const loadProperties = async () => {
     try {
-        const response = await fetch('http://127.0.0.1:8000/api/v1/org/properties')
-        const data = await response.json()
-        if (data.success) {
-            properties.value = data.data.data
+        const token = localStorage.getItem('token')
+        let { data } = await fetchJson('/api/v1/org/properties', token ? {
+            headers: { 'Authorization': 'Bearer ' + token }
+        } : { credentials: 'include' })
+        if (!data?.success) {
+            const fb = await fetchJson('/user/org/properties', { credentials: 'include' })
+            data = fb.data
+        }
+        if (data?.success) {
+            const payload = data.data
+            properties.value = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : [])
         }
     } catch (error) {
         console.error('Error loading properties:', error)
@@ -404,11 +440,10 @@ const editInvoice = (invoice) => {
 
 const downloadPdf = async (invoice) => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/api/v1/org/invoices/${invoice.id}/pdf`, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
-        })
+        const token = localStorage.getItem('token')
+        const response = await fetch(`/api/v1/org/invoices/${invoice.id}/pdf`, token ? {
+            headers: { 'Authorization': 'Bearer ' + token }
+        } : { credentials: 'include' })
         
         if (response.ok) {
             const blob = await response.blob()
@@ -429,12 +464,14 @@ const downloadPdf = async (invoice) => {
 const deleteInvoice = async (invoice) => {
     if (confirm('Are you sure you want to delete this invoice?')) {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/v1/org/invoices/${invoice.id}`, {
+            const token = localStorage.getItem('token')
+            const response = await fetch(`/api/v1/org/invoices/${invoice.id}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                headers: token ? {
+                    'Authorization': 'Bearer ' + token,
                     'Content-Type': 'application/json'
-                }
+                } : { 'Content-Type': 'application/json' },
+                credentials: token ? undefined : 'include'
             })
             
             if (response.ok) {

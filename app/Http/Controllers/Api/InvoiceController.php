@@ -33,7 +33,7 @@ class InvoiceController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('invoice_number', 'like', "%{$search}%")
+                $q->where('invoice_no', 'like', "%{$search}%")
                   ->orWhereHas('tenant', function ($tenantQuery) use ($search) {
                       $tenantQuery->where('name', 'like', "%{$search}%")
                                   ->orWhere('email', 'like', "%{$search}%");
@@ -84,15 +84,10 @@ class InvoiceController extends Controller
         $validator = Validator::make($request->all(), [
             'tenant_id' => 'required|exists:tenants,id',
             'property_id' => 'required|exists:properties,id',
-            'type' => 'required|in:rent,maintenance,penalty,other',
             'amount' => 'required|numeric|min:0',
+            'tax' => 'nullable|numeric|min:0',
             'due_date' => 'required|date|after_or_equal:today',
-            'description' => 'nullable|string|max:1000',
-            'items' => 'nullable|array',
-            'items.*.description' => 'required_with:items|string|max:255',
-            'items.*.quantity' => 'required_with:items|numeric|min:0',
-            'items.*.rate' => 'required_with:items|numeric|min:0',
-            'items.*.amount' => 'required_with:items|numeric|min:0',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
         if ($validator->fails()) {
@@ -121,18 +116,21 @@ class InvoiceController extends Controller
 
         // Generate invoice number
         $invoiceNumber = $this->generateInvoiceNumber();
+        $tax = (float) ($request->tax ?? 0);
+        $amount = (float) $request->amount;
+        $totalAmount = $amount + $tax;
 
         $invoice = Invoice::create([
             'org_id' => auth()->user()->org_id,
             'tenant_id' => $request->tenant_id,
             'property_id' => $request->property_id,
-            'invoice_number' => $invoiceNumber,
-            'type' => $request->type,
-            'amount' => $request->amount,
+            'invoice_no' => $invoiceNumber,
+            'invoice_date' => now()->toDateString(),
+            'amount' => $amount,
+            'tax' => $tax,
+            'total_amount' => $totalAmount,
             'due_date' => $request->due_date,
-            'description' => $request->description,
-            'items' => $request->items ? json_encode($request->items) : null,
-            'status' => 'pending',
+            'status' => 'draft',
             'notes' => $request->notes,
         ]);
 
@@ -251,7 +249,7 @@ class InvoiceController extends Controller
 
         $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
         
-        $filename = "invoice-{$invoice->invoice_number}.pdf";
+        $filename = "invoice-{$invoice->invoice_no}.pdf";
         
         return response($pdf->output(), 200, [
             'Content-Type' => 'application/pdf',
@@ -412,8 +410,8 @@ class InvoiceController extends Controller
         
         // Get the last invoice number for this month
         $lastInvoice = Invoice::where('org_id', auth()->user()->org_id)
-            ->where('invoice_number', 'like', "{$prefix}-{$year}{$month}%")
-            ->orderBy('invoice_number', 'desc')
+            ->where('invoice_no', 'like', "{$prefix}-{$year}{$month}%")
+            ->orderBy('invoice_no', 'desc')
             ->first();
 
         if ($lastInvoice) {
